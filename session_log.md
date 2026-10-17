@@ -89,3 +89,33 @@ public으로 변환해줘
 ## 2026-10-17 17:30:22
 
 docs/prd.md, docs/architecture.md는 현재와 같이 확정하고 2단계 진행하라
+
+---
+
+## 2026-10-17 17:36 (backfilled — hook was not running)
+
+supabase 설정 완료했어. 커밋하고 다음단계 진행하라
+
+---
+
+## 2026-10-17 17:45 (backfilled — hook was not running)
+
+  src/lib/dates.ts 파일 추가하고 아키텍처 문서에도 변경내역을 업데이트 하고, 다음 단계로 진행하라
+
+---
+
+## 2026-10-17 17:52 (backfilled — hook was not running)
+
+터미널에 내가 입력한 내용 session_log 파일에 잘 반영하고 있지?
+
+---
+
+## 2026-10-17 17:58:12
+
+http://localhost:5173 확인했어. spec 02 작업 진행하라
+
+---
+
+## 2026-10-17 17:58:26
+
+커밋 먼저 해줘

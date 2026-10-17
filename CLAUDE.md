@@ -24,7 +24,7 @@
 
 ## 코드 규칙
 - React + TypeScript + Vite, Tailwind, Supabase (자세한 내용은 `docs/tech_stack.md`)
-- 계산 로직(칸 생성, 집계, Best time)은 `src/lib/slots.ts`의 순수 함수로만 작성하고 Vitest로 테스트
+- 계산 로직은 순수 함수로만 작성하고 Vitest로 테스트: 날짜 입력 계산은 `src/lib/dates.ts`, 칸 생성·집계·Best time은 `src/lib/slots.ts`
 - Supabase 호출은 `src/lib/api.ts`에만 둔다. 컴포넌트에서 직접 호출하지 않음
 - 그리드는 `src/components/Grid.tsx` 하나를 mode(`block` | `select` | `heatmap`)로 재사용
 - UI 문구는 쉽고 일상적인 영어. 색은 흰 배경 모노톤 + 그린 강조색 하나

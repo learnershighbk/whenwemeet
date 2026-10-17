@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-prompt.js\" 2>/dev/null || true",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-prompt.cjs\" 2>/dev/null || true",
             "timeout": 10
           }
         ]
