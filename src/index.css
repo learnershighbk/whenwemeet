@@ -7,25 +7,25 @@
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 
-  --color-page: #f4f6f8;      /* page background */
+  --color-page: #eceff3;      /* page background */
   --color-card: #ffffff;      /* cards, inputs, grid cells */
-  --color-ink: #1b1f26;       /* primary text, primary buttons */
-  --color-ink-soft: #2f3640;  /* primary button hover */
-  --color-muted: #5b6573;     /* secondary text */
-  --color-faint: #8b94a1;     /* placeholders, disabled text */
-  --color-line: #dfe3e8;      /* borders */
-  --color-line-soft: #eceff3; /* dividers, hover fills */
-  --color-blocked: #e1e5ea;   /* blocked cells */
+  --color-ink: #14181f;       /* primary text, primary buttons */
+  --color-ink-soft: #262c36;  /* primary button hover */
+  --color-muted: #4b5563;     /* secondary text */
+  --color-faint: #7b8593;     /* placeholders, disabled text */
+  --color-line: #d3d9e0;      /* borders */
+  --color-line-soft: #e4e8ed; /* dividers, hover fills */
+  --color-blocked: #d5dbe2;   /* blocked cells */
 
-  --color-pick: #1f7a4d;      /* accent: my selection, best time */
-  --color-pick-soft: #e8f3ed; /* accent tint for badges */
-  --color-heat-1: #e6f2ea;
-  --color-heat-2: #bfe0cc;
-  --color-heat-3: #8cc6a3;
-  --color-heat-4: #4e9f72;
-  --color-heat-5: #1f7a4d;
+  --color-pick: #166b40;      /* accent: my selection, best time */
+  --color-pick-soft: #dcede3; /* accent tint for badges */
+  --color-heat-1: #d9ebe1;
+  --color-heat-2: #a9d4bb;
+  --color-heat-3: #6fb58d;
+  --color-heat-4: #388f5f;
+  --color-heat-5: #166b40;
 
-  --shadow-card: 0 1px 2px rgb(27 31 38 / 0.04), 0 1px 3px rgb(27 31 38 / 0.06);
+  --shadow-card: 0 1px 2px rgb(20 24 31 / 0.06), 0 2px 6px rgb(20 24 31 / 0.08);
 }
 
 body {
