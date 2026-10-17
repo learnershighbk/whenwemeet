@@ -91,14 +91,20 @@ export default function Grid(props: GridProps) {
   }
 
   const rowHeight = slotMinutes === 30 ? 24 : 16
-  const columns = `2.75rem repeat(${dates.length}, minmax(var(--cell-w), 120px))`
+  // Width rule (docs/design.md §5, Spec 02 R2): columns share the available width when every
+  // date fits at its minimum cell width; otherwise the grid grows to n × min width and scrolls.
+  // clamp(min, 100%, max) resolves to `min` when min > max, which is exactly the overflow case.
+  const n = dates.length
+  const LABEL = '2.75rem'
+  const gridWidth = `clamp(calc(${LABEL} + ${n} * var(--cell-w)), 100%, calc(${LABEL} + ${n} * var(--cell-max)))`
+  const columns = `${LABEL} repeat(${n}, minmax(0, 1fr))`
 
   return (
     <div
-      className="overflow-x-auto overscroll-x-contain [--cell-w:40px] sm:[--cell-w:48px]"
+      className="overflow-x-auto overscroll-x-contain [--cell-w:40px] [--cell-max:120px] sm:[--cell-w:48px]"
       onPointerLeave={() => props.mode === 'heatmap' && props.onCellHover?.(null, null)}
     >
-      <div className="grid w-max min-w-full" style={{ gridTemplateColumns: columns }}>
+      <div className="grid" style={{ width: gridWidth, gridTemplateColumns: columns }}>
         {/* Header */}
         <div className="sticky left-0 z-10 bg-card" />
         {dates.map((date) => {

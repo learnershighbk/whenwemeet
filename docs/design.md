@@ -72,6 +72,7 @@ B2B 이벤트 관리 도구(Cvent류)의 **구조와 밀도**를 참고한 "엔�
 | `.stat` | 요약 지표 칩: `rounded-md bg-brand-soft px-3 py-2` — 위 라벨(아이브로), 아래 값 |
 | `PageHeader` | `title`, `meta?`, `children?`(스트립) |
 | Grid 칸 | 흰 배경 + `line` 테두리, 정시 실선·그 외 점선. 막힘 = `blocked` + 사선. 내 선택 = `pick`. 히트맵 = `heat-n`. Best time = `pick` 2px 테두리. 포커스/탭 = `brand` 2px 테두리 |
+| Grid 폭 | 시간 라벨 열 44px + 날짜 열. 날짜 열은 **가용 폭을 균등 분배**(최대 120px). 모든 날짜가 최소 폭(모바일 40px / 데스크톱 48px)으로도 들어가지 않을 때만 그리드가 커지며 가로 스크롤. 데스크톱 2열 카드(약 490px)에서 9일, 375px 카드에서 6일까지 스크롤 없음 |
 | Calendar | 선택일 = `brand` 배경 흰 글자, 오늘 = 밑줄, 지난 날 = `faint` |
 | 토글/세그먼트 | 켜짐 = `brand` |
 | 확인 창 | 카드 규격, 버튼은 primary/secondary |
