@@ -17,6 +17,7 @@
 |---|---|---|
 | `/` | `CreatePage` | 3단계 상태: `form` → `edit` → `share` (한 페이지 안에서 전환) |
 | `/e/:id` | `EventPage` | 로그인 폼 / 내 그리드 + 히트맵 + Best time |
+| `/about` | `AboutPage` | 소개·사용 방법·FAQ (정적) |
 
 ## 2. 모듈 책임
 | 모듈 | 책임 | 의존 |
@@ -108,6 +109,7 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 | 2026-10-17 | `lib/session` 모듈 추가 (Spec 03). 로그인 유지 저장소 접근을 한곳에 모음 |
 | 2026-10-17 | Realtime 구독을 `lib/api.subscribeAvailability`로 감싸고 `hooks/useEventRealtime`은 이를 호출 (Spec 04). supabase 클라이언트 접근을 `lib/api`로 한정 |
 | 2026-10-17 | Vercel 프로덕션 배포 (https://whenwemeet-beta.vercel.app). Vite dev 서버 `host: true` |
+| 2026-10-17 | `/about` 라우트 추가 (헤더 메뉴). 정적 소개 페이지 |
 | 2026-10-17 | **보안 구조 변경 (코드 리뷰 F4 #1)**: 테이블 select 정책 제거, 읽기는 RPC `get_event`·`list_availability`, 실시간은 비공개 broadcast 채널. slot 키 서버 검증 추가. `supabase/migrations/002_security.sql` |
 - RPC: `supabase/migrations`의 SQL을 로컬/개발 프로젝트에 적용 후 수동 확인.
 - 화면: spec의 AC별 수동 확인 절차를 `tasks.md`에 기록 (데스크톱 + 375px 모바일, 브라우저 2개로 실시간 확인).

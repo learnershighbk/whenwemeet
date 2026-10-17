@@ -284,3 +284,9 @@ tests 27/27 pass · `tsc -b --noEmit` exit 0 · `npm run build` pass.</result>
 ## 2026-10-17 19:08:46
 
 002 적용 완료했어. 디자인은 조금 더 진한 색상을 적용하라.
+
+---
+
+## 2026-10-17 19:14:59
+
+헤더에 About WhenWeMeet 메뉴 추가하고 소개와 사용 방법을 간결하게 추가하라
