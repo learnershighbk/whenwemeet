@@ -35,10 +35,11 @@
 | `npm run dev` | 개발 서버 |
 | `npm run build` | 타입 검사 + 빌드 |
 | `npm test` | Vitest 실행 |
-| `vercel --prod` | 프로덕션 배포 (https://whenwemeet-beta.vercel.app). GitHub push 자동 배포는 미연결 |
+| `git push` (main) | GitHub 연동으로 Vercel 프로덕션 자동 배포 (https://whenwemeet-beta.vercel.app). `vercel --prod`는 수동 배포가 필요할 때만 |
 
 - 환경 변수: `.env.example`을 `.env`로 복사 후 Supabase URL/anon key 입력
 - DB: `supabase/migrations/*.sql`을 Supabase SQL Editor에서 순서대로 실행
+- 마이그레이션이 포함된 변경은 **SQL을 먼저 적용한 뒤 push** (push 즉시 배포되므로 순서가 바뀌면 사이트가 잠시 깨진다)
 
 ## 기타
 - `session_log.md`는 hook이 사용자 입력을 자동 기록한다. 직접 편집하지 않는다 (hook이 못 잡는 질문 답변만 추가).
