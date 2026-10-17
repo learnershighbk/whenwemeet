@@ -29,5 +29,15 @@
 - 그리드는 `src/components/Grid.tsx` 하나를 mode(`block` | `select` | `heatmap`)로 재사용
 - UI 문구는 쉽고 일상적인 영어. 색은 흰 배경 모노톤 + 그린 강조색 하나
 
+## 명령어
+| 명령 | 용도 |
+|---|---|
+| `npm run dev` | 개발 서버 |
+| `npm run build` | 타입 검사 + 빌드 |
+| `npm test` | Vitest 실행 |
+
+- 환경 변수: `.env.example`을 `.env`로 복사 후 Supabase URL/anon key 입력
+- DB: `supabase/migrations/*.sql`을 Supabase SQL Editor에서 순서대로 실행
+
 ## 기타
 - `session_log.md`는 hook이 사용자 입력을 자동 기록한다. 직접 편집하지 않는다 (hook이 못 잡는 질문 답변만 추가).

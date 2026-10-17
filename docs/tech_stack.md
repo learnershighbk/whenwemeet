@@ -13,4 +13,6 @@
 | 배포 | Vercel (정적 SPA) | Git 연결만으로 배포 |
 | 테스트 | Vitest | Vite와 설정 공유, `lib/slots` 단위 테스트 |
 
+설치 버전 (2026-10-17): React 19, Vite 8, TypeScript 7, Tailwind 4, Vitest 5, react-router 7, supabase-js 2, date-fns 4.
+
 데이터 스키마·권한·데이터 흐름은 `architecture.md` 참고.

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Monotone + one green accent (docs/prd.md §6) */
+@theme {
+  --color-ink: #111111;
+  --color-muted: #6b6b6b;
+  --color-line: #e5e5e5;
+  --color-blocked: #d9d9d9;
+  --color-pick: #22a559;
+  --color-heat-1: #e8f5ec;
+  --color-heat-2: #b9e3c6;
+  --color-heat-3: #7fcb98;
+  --color-heat-4: #3fa865;
+  --color-heat-5: #166e3b;
+}
+
+body {
+  @apply bg-white text-ink antialiased;
+}
