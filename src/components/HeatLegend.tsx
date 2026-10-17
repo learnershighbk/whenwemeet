@@ -7,7 +7,7 @@ export default function HeatLegend({ total }: { total: number }) {
     <div className="mt-3 flex items-center gap-2 text-xs text-muted" aria-label="Heatmap legend">
       <span>0/{total} available</span>
       <div className="flex overflow-hidden rounded border border-line">
-        <span className="h-3 w-5 bg-white" />
+        <span className="h-3 w-5 bg-card" />
         {LEVELS.map((cls) => (
           <span key={cls} className={`h-3 w-5 ${cls}`} />
         ))}

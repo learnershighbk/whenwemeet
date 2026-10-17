@@ -31,7 +31,7 @@ export type GridProps =
     })
 
 const HATCH = 'repeating-linear-gradient(135deg, transparent 0 4px, rgba(0,0,0,0.08) 4px 6px)'
-const HEAT_BG = ['bg-white', 'bg-heat-1', 'bg-heat-2', 'bg-heat-3', 'bg-heat-4', 'bg-heat-5']
+const HEAT_BG = ['bg-card', 'bg-heat-1', 'bg-heat-2', 'bg-heat-3', 'bg-heat-4', 'bg-heat-5']
 
 export default function Grid(props: GridProps) {
   const { dates, rows, slotMinutes, blocked, mode } = props
@@ -100,7 +100,7 @@ export default function Grid(props: GridProps) {
     >
       <div className="grid w-max min-w-full" style={{ gridTemplateColumns: columns }}>
         {/* Header */}
-        <div className="sticky left-0 z-10 bg-white" />
+        <div className="sticky left-0 z-10 bg-card" />
         {dates.map((date) => {
           const { weekday, day } = dateHeader(date)
           return (
@@ -117,7 +117,7 @@ export default function Grid(props: GridProps) {
           return (
             <div key={row.minute} className="contents">
               <div
-                className="sticky left-0 z-10 bg-white pr-1 text-right text-[11px] leading-none text-muted"
+                className="sticky left-0 z-10 bg-card pr-1 text-right text-[11px] leading-none text-muted"
                 style={{ height: rowHeight }}
               >
                 <span className="relative -top-1.5">{rowLabel(row.minute)}</span>
@@ -190,8 +190,8 @@ export default function Grid(props: GridProps) {
                       ...edges,
                       'touch-none select-none focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
                       disabled && 'cursor-not-allowed',
-                      mode === 'block' && (on ? 'bg-blocked' : 'bg-white hover:bg-line/40'),
-                      mode === 'select' && (isBlocked ? 'bg-blocked' : on ? 'bg-pick' : 'bg-white hover:bg-line/40'),
+                      mode === 'block' && (on ? 'bg-blocked' : 'bg-card hover:bg-line-soft'),
+                      mode === 'select' && (isBlocked ? 'bg-blocked' : on ? 'bg-pick' : 'bg-card hover:bg-line-soft'),
                     ]
                       .filter(Boolean)
                       .join(' ')}

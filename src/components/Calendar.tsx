@@ -71,7 +71,7 @@ export default function Calendar({ value, onChange }: Props) {
             checked={value.mode === 'range'}
             onChange={(e) => setMode(e.target.checked)}
           />
-          <span className="relative h-5 w-9 rounded-full bg-line transition-colors peer-checked:bg-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
+          <span className="relative h-5 w-9 rounded-full bg-line transition-colors peer-checked:bg-pick peer-focus-visible:ring-2 peer-focus-visible:ring-ink/20 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
         </label>
       </div>
 
@@ -81,7 +81,7 @@ export default function Calendar({ value, onChange }: Props) {
           onClick={() => moveMonth(-1)}
           disabled={atFirstMonth}
           aria-label="Previous month"
-          className="flex h-11 w-11 items-center justify-center rounded-full text-lg hover:bg-line/60 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-lg hover:bg-line-soft disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
         >
           ‹
         </button>
@@ -90,7 +90,7 @@ export default function Calendar({ value, onChange }: Props) {
           type="button"
           onClick={() => moveMonth(1)}
           aria-label="Next month"
-          className="flex h-11 w-11 items-center justify-center rounded-full text-lg hover:bg-line/60"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-lg hover:bg-line-soft"
         >
           ›
         </button>
@@ -125,8 +125,8 @@ export default function Calendar({ value, onChange }: Props) {
               })}
               className={[
                 'mx-auto flex aspect-square w-full max-w-11 items-center justify-center rounded-full text-sm transition-colors',
-                past && 'cursor-not-allowed text-muted/40',
-                !past && !selected && 'hover:bg-line/60',
+                past && 'cursor-not-allowed text-faint/60',
+                !past && !selected && 'hover:bg-line-soft',
                 selected && 'bg-ink font-medium text-white',
                 isAnchor && 'ring-2 ring-ink ring-offset-2',
                 key === today && !selected && 'font-semibold underline underline-offset-4',

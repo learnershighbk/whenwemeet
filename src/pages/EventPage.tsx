@@ -46,7 +46,7 @@ export default function EventPage() {
     return (
       <Centered>
         <p className="mb-4">Couldn't load the event.</p>
-        <button type="button" onClick={load} className="h-11 rounded-lg border border-line px-5 font-medium hover:border-muted">
+        <button type="button" onClick={load} className="btn-secondary h-11 px-5">
           Try again
         </button>
       </Centered>
@@ -128,7 +128,7 @@ function EventBody({ event }: { event: Event }) {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold sm:text-3xl">{event.title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{event.title}</h1>
         <p className="mt-1 text-muted">
           {summarizeDates(event.dates)} · {hourLabel(event.startHour)} – {hourLabel(event.endHour)}
         </p>
@@ -136,7 +136,7 @@ function EventBody({ event }: { event: Event }) {
       </header>
 
       {status === 'reconnecting' && (
-        <div role="status" className="mb-4 rounded-lg border border-line bg-line/40 px-4 py-2 text-sm">
+        <div role="status" className="mb-4 rounded-lg border border-line bg-line-soft px-4 py-2 text-sm">
           Reconnecting…
         </div>
       )}
@@ -147,7 +147,7 @@ function EventBody({ event }: { event: Event }) {
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* My column */}
-        <section aria-label="My availability">
+        <section aria-label="My availability" className="card p-4 sm:p-6">
           <h2 className="mb-3 text-lg font-semibold">My availability</h2>
           {session ? (
             <>
@@ -196,7 +196,7 @@ function EventBody({ event }: { event: Event }) {
         </section>
 
         {/* Group column */}
-        <section aria-label="Group availability">
+        <section aria-label="Group availability" className="card p-4 sm:p-6">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-lg font-semibold">Group availability</h2>
             <span className="text-sm text-muted">Responses ({total})</span>
@@ -218,7 +218,7 @@ function EventBody({ event }: { event: Event }) {
           <HeatLegend total={total} />
 
           {activeCell && total > 0 && (
-            <div className="mt-4 rounded-lg border border-line p-3">
+            <div className="mt-4 rounded-lg border border-line bg-line-soft/60 p-3">
               <SlotDetail {...detailFor(activeCell)} />
             </div>
           )}
@@ -340,7 +340,7 @@ function Tooltip({ rect, children }: { rect: DOMRect; children: React.ReactNode 
   return (
     <div
       role="tooltip"
-      className="pointer-events-none fixed z-50 rounded-lg border border-line bg-white p-3 shadow-lg"
+      className="pointer-events-none fixed z-50 rounded-lg border border-line bg-card p-3 shadow-lg"
       style={{ width, left, top: above ? rect.top - 8 : rect.bottom + 8, transform: above ? 'translateY(-100%)' : undefined }}
     >
       {children}

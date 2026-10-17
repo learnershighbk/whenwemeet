@@ -55,14 +55,15 @@ export default function CreatePage() {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-8 sm:py-12">
-      <h1 className="mb-8 text-2xl font-semibold sm:text-3xl">Plan a meeting</h1>
+      <h1 className="mb-2 text-2xl font-semibold tracking-tight sm:text-3xl">Plan a meeting</h1>
+      <p className="mb-8 text-muted">Pick the days and hours to ask about, then share one link.</p>
 
       <form
         onSubmit={(e) => {
           e.preventDefault()
           create()
         }}
-        className="divide-y divide-line rounded-xl border border-line"
+        className="card divide-y divide-line-soft"
       >
         <section className="p-4 sm:p-6">
           <label htmlFor="title" className="mb-2 block font-medium">
@@ -75,7 +76,7 @@ export default function CreatePage() {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Weekly team sync"
             autoComplete="off"
-            className="h-11 w-full rounded-lg border border-line px-3 placeholder:text-muted/60 focus:border-muted focus:outline-none"
+            className="field h-11 w-full"
           />
         </section>
 
@@ -95,7 +96,7 @@ export default function CreatePage() {
                   setStartHour(start)
                   setEndHour((end) => adjustEndHour(start, end))
                 }}
-                className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-3 text-ink focus:border-muted focus:outline-none"
+                className="field mt-1 h-11 w-full"
               >
                 {FROM_HOURS.map((h) => (
                   <option key={h} value={h}>
@@ -109,7 +110,7 @@ export default function CreatePage() {
               <select
                 value={endHour}
                 onChange={(e) => setEndHour(Number(e.target.value))}
-                className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-3 text-ink focus:border-muted focus:outline-none"
+                className="field mt-1 h-11 w-full"
               >
                 {TO_HOURS.map((h) => (
                   <option key={h} value={h} disabled={h <= startHour}>
@@ -129,7 +130,7 @@ export default function CreatePage() {
           <button
             type="submit"
             disabled={!canCreate}
-            className="h-12 w-full rounded-lg bg-ink font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
+            className="btn-primary h-12 w-full"
           >
             Create Event
           </button>
@@ -177,14 +178,14 @@ function EditStep({ draft, onBack, onCreated }: {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-      <h1 className="mb-1 text-2xl font-semibold sm:text-3xl">Fine-tune your times</h1>
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight sm:text-3xl">Fine-tune your times</h1>
       <p className="mb-6 text-sm text-muted">
         {draft.title} · Times in {draft.timezone}
       </p>
 
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <span className="text-sm text-muted">Slot size</span>
-        <div className="inline-flex rounded-lg border border-line p-0.5" role="group" aria-label="Slot size">
+        <div className="inline-flex rounded-lg border border-line bg-card p-0.5" role="group" aria-label="Slot size">
           {([30, 15] as const).map((m) => (
             <button
               key={m}
@@ -200,20 +201,22 @@ function EditStep({ draft, onBack, onCreated }: {
       </div>
       <p className="mb-4 text-sm text-muted">Tap or drag to block times you don't need.</p>
 
-      <Grid
-        dates={draft.dates}
-        rows={rows}
-        slotMinutes={slotMinutes}
-        mode="block"
-        blocked={blocked}
-        onBlockedChange={setBlocked}
-      />
+      <div className="card p-3 sm:p-4">
+        <Grid
+          dates={draft.dates}
+          rows={rows}
+          slotMinutes={slotMinutes}
+          mode="block"
+          blocked={blocked}
+          onBlockedChange={setBlocked}
+        />
+      </div>
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="h-12 rounded-lg border border-line px-5 font-medium hover:border-muted"
+          className="btn-secondary h-12 px-5"
         >
           Back
         </button>
@@ -222,7 +225,7 @@ function EditStep({ draft, onBack, onCreated }: {
             type="button"
             disabled={allBlocked}
             onClick={() => setConfirmFinalize(true)}
-            className="h-12 rounded-lg bg-ink px-6 font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
+            className="btn-primary h-12 px-6"
           >
             Finalize Event
           </button>
@@ -282,7 +285,8 @@ function ShareStep({ id }: { id: string }) {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-12 sm:py-20">
-      <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">Your event is ready!</h1>
+      <div className="card p-6 sm:p-8">
+      <h1 className="mb-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your event is ready!</h1>
       <p className="mb-6 text-muted">Send this link to your participants.</p>
       <input
         ref={inputRef}
@@ -290,19 +294,19 @@ function ShareStep({ id }: { id: string }) {
         value={url}
         onFocus={(e) => e.target.select()}
         aria-label="Event link"
-        className="mb-4 h-12 w-full rounded-lg border border-line px-3 font-mono text-sm focus:border-muted focus:outline-none"
+        className="field mb-4 h-12 w-full font-mono text-sm"
       />
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
           onClick={copy}
-          className="h-12 flex-1 rounded-lg bg-ink px-5 font-medium text-white hover:opacity-90"
+          className="btn-primary h-12 flex-1 px-5"
         >
           {copied ? 'Link copied!' : 'Copy link'}
         </button>
         <Link
           to={`/e/${id}`}
-          className="flex h-12 flex-1 items-center justify-center rounded-lg border border-line px-5 font-medium hover:border-muted"
+          className="btn-secondary flex h-12 flex-1 items-center justify-center px-5"
         >
           Open event page
         </Link>
@@ -310,6 +314,7 @@ function ShareStep({ id }: { id: string }) {
       <p className="mt-3 min-h-5 text-sm text-muted" aria-live="polite">
         {manual && 'Press Ctrl+C to copy.'}
       </p>
+      </div>
     </main>
   )
 }

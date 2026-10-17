@@ -44,7 +44,7 @@ export default function SignInForm({ onJoin }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-xl border border-line p-4 sm:p-6">
+    <form onSubmit={submit} className="card p-4 sm:p-6">
       <h2 className="mb-4 text-lg font-semibold">Who are you?</h2>
 
       <label htmlFor="name" className="mb-1 block text-sm text-muted">
@@ -57,7 +57,7 @@ export default function SignInForm({ onJoin }: Props) {
         onChange={(e) => setName(e.target.value)}
         autoComplete="name"
         autoFocus
-        className="mb-4 h-11 w-full rounded-lg border border-line px-3 focus:border-muted focus:outline-none"
+        className="field mb-4 h-11 w-full"
       />
 
       <label htmlFor="password" className="mb-1 block text-sm text-muted">
@@ -70,7 +70,7 @@ export default function SignInForm({ onJoin }: Props) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="off"
-        className="mb-2 h-11 w-full rounded-lg border border-line px-3 focus:border-muted focus:outline-none"
+        className="field mb-2 h-11 w-full"
       />
       <p className="mb-4 text-sm text-muted">
         No sign-up needed. Add a password only if you want to keep others from editing your times.
@@ -79,7 +79,7 @@ export default function SignInForm({ onJoin }: Props) {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="h-12 w-full rounded-lg bg-ink font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
+        className="btn-primary h-12 w-full"
       >
         {busy ? 'Joining…' : 'Continue'}
       </button>

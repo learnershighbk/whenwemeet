@@ -1,19 +1,48 @@
 @import "tailwindcss";
 
-/* Monotone + one green accent (docs/prd.md §6) */
+/*
+ * Palette (docs/prd.md §6): white cards on a very light cool-grey page, near-black text,
+ * slate secondary text, one deep green accent. Nothing saturated besides the green.
+ */
 @theme {
-  --color-ink: #111111;
-  --color-muted: #6b6b6b;
-  --color-line: #e5e5e5;
-  --color-blocked: #d9d9d9;
-  --color-pick: #22a559;
-  --color-heat-1: #e8f5ec;
-  --color-heat-2: #b9e3c6;
-  --color-heat-3: #7fcb98;
-  --color-heat-4: #3fa865;
-  --color-heat-5: #166e3b;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+
+  --color-page: #f4f6f8;      /* page background */
+  --color-card: #ffffff;      /* cards, inputs, grid cells */
+  --color-ink: #1b1f26;       /* primary text, primary buttons */
+  --color-ink-soft: #2f3640;  /* primary button hover */
+  --color-muted: #5b6573;     /* secondary text */
+  --color-faint: #8b94a1;     /* placeholders, disabled text */
+  --color-line: #dfe3e8;      /* borders */
+  --color-line-soft: #eceff3; /* dividers, hover fills */
+  --color-blocked: #e1e5ea;   /* blocked cells */
+
+  --color-pick: #1f7a4d;      /* accent: my selection, best time */
+  --color-pick-soft: #e8f3ed; /* accent tint for badges */
+  --color-heat-1: #e6f2ea;
+  --color-heat-2: #bfe0cc;
+  --color-heat-3: #8cc6a3;
+  --color-heat-4: #4e9f72;
+  --color-heat-5: #1f7a4d;
+
+  --shadow-card: 0 1px 2px rgb(27 31 38 / 0.04), 0 1px 3px rgb(27 31 38 / 0.06);
 }
 
 body {
-  @apply bg-white text-ink antialiased;
+  @apply bg-page text-ink antialiased;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-line bg-card shadow-card;
+  }
+  .btn-primary {
+    @apply rounded-lg bg-ink font-medium text-white transition-colors hover:bg-ink-soft disabled:cursor-not-allowed disabled:bg-line disabled:text-faint;
+  }
+  .btn-secondary {
+    @apply rounded-lg border border-line bg-card font-medium text-ink transition-colors hover:border-muted hover:bg-line-soft;
+  }
+  .field {
+    @apply rounded-lg border border-line bg-card px-3 text-ink placeholder:text-faint transition-colors focus:border-muted focus:outline-none focus:ring-2 focus:ring-ink/10;
+  }
 }

@@ -69,7 +69,7 @@ export default function TimezoneSelect({ value, onChange, id }: Props) {
         onClick={() => (open ? setOpen(false) : openList())}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex h-11 w-full items-center justify-between rounded-lg border border-line px-3 text-left hover:border-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+        className="field flex h-11 w-full items-center justify-between text-left hover:border-muted"
       >
         <span className="truncate">{timezoneLabel(value)}</span>
         <span className="ml-2 text-muted" aria-hidden>
@@ -78,7 +78,7 @@ export default function TimezoneSelect({ value, onChange, id }: Props) {
       </button>
 
       {open && (
-        <div className="absolute z-10 mt-1 w-full rounded-lg border border-line bg-white shadow-lg">
+        <div className="absolute z-10 mt-1 w-full rounded-lg border border-line bg-card shadow-lg">
           <div className="border-b border-line p-2">
             <input
               autoFocus
@@ -90,14 +90,14 @@ export default function TimezoneSelect({ value, onChange, id }: Props) {
               onKeyDown={onKeyDown}
               placeholder="Search city or region"
               aria-label="Search time zones"
-              className="h-10 w-full rounded-md border border-line px-3 text-sm focus:border-muted focus:outline-none"
+              className="field h-10 w-full text-sm"
             />
           </div>
           <div ref={listRef} role="listbox" className="max-h-72 overflow-y-auto py-1">
             {groups.length === 0 && <p className="px-3 py-2 text-sm text-muted">No matches.</p>}
             {groups.map((g) => (
               <div key={g.group}>
-                <div className="sticky top-0 bg-white px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-muted">
+                <div className="sticky top-0 bg-card px-3 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-faint">
                   {g.group}
                 </div>
                 {g.zones.map((z) => {
@@ -113,7 +113,7 @@ export default function TimezoneSelect({ value, onChange, id }: Props) {
                       onClick={() => choose(z.id)}
                       className={[
                         'cursor-pointer px-3 py-2 text-sm',
-                        i === active && 'bg-line/60',
+                        i === active && 'bg-line-soft',
                         z.id === value && 'font-medium',
                       ]
                         .filter(Boolean)
