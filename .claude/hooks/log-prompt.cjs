@@ -14,6 +14,9 @@ process.stdin.on("end", () => {
   }
   const prompt = input.prompt;
   if (!prompt) return;
+  // Background-task and system notifications arrive on the same channel; they are not user input.
+  const head = prompt.trimStart().slice(0, 200);
+  if (head.startsWith("<task-notification>") || head.startsWith("<system-reminder>") || head.includes("[SYSTEM NOTIFICATION")) return;
 
   const root = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
   const file = path.join(root, "session_log.md");
