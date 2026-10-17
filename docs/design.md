@@ -37,7 +37,9 @@ B2B 이벤트 관리 도구(Cvent류)의 **구조와 밀도**를 참고한 "엔�
 규칙: 블루와 그린이 한 화면에 함께 있어도, **그린은 "가능"을 뜻하는 자리에만** 나타난다. 그린 버튼·그린 링크는 없다.
 
 ## 3. 타이포그래피
-- 폰트: 시스템 스택 (`ui-sans-serif, system-ui, Segoe UI, Roboto, …`). 외부 폰트 로딩 없음.
+- 폰트: **시스템 스택** — academy.claude.com의 폴백 스택과 동일 (`ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, PingFang SC/TC, Hiragino Sans, Apple SD Gothic Neo, Malgun Gothic, sans-serif`). 외부 폰트 로딩 없음.
+  - 영문: Windows = Segoe UI, Apple = SF. 한글: Apple = Apple SD Gothic Neo, Windows = 맑은 고딕.
+  - 해당 사이트의 본문 글꼴 Anthropic Sans는 독점 글꼴이라 쓰지 않는다. 웹폰트가 필요해지면 Pretendard Variable(OFL)을 1순위 대안으로 검토.
 - 위계
   - 페이지 제목: `text-2xl sm:text-3xl font-semibold tracking-tight`
   - 카드 제목: `text-base font-semibold`
@@ -89,4 +91,5 @@ B2B 이벤트 관리 도구(Cvent류)의 **구조와 밀도**를 참고한 "엔�
 |---|---|
 | 2026-10-17 | v0: 순백 모노톤 + 밝은 그린 (초기 구현) |
 | 2026-10-17 | v0.5: 연한 회색 배경 + 흰 카드, 깊은 그린 |
+| 2026-10-17 | v1.0.1: 그리드 열 폭 균등 분배(5일 한 화면), 글꼴 스택을 academy.claude.com 폴백과 동일하게. 내 선택 칸은 그린 유지로 확정 |
 | 2026-10-17 | **v1.0: 엔터프라이즈 네이비.** 네이비 헤더, 블루 행동색, 그린은 가능 시간 전용, 둥글기 6px, 페이지 헤더 밴드·요약 스트립·2열 생성 화면 |

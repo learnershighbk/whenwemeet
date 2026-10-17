@@ -6,7 +6,10 @@
  * green is reserved for "available time". Everything else is neutral.
  */
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  /* System stack matching academy.claude.com's fallback (no proprietary web font).
+     Hangul: Apple SD Gothic Neo on Apple devices, Malgun Gothic on Windows. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang SC', 'PingFang TC',
+    'Hiragino Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
   --color-nav: #14213d;
   --color-nav-fg: #ffffff;
