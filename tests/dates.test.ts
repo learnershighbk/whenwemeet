@@ -9,6 +9,7 @@ import {
   hourLabel,
   monthWeeks,
   rangeClick,
+  summarizeDates,
   timezoneLabel,
   toggleDate,
 } from '../src/lib/dates'
@@ -107,5 +108,16 @@ describe('time zones', () => {
   it('groups alphabetically; zones without a continent go to Other', () => {
     const groups = groupTimezones(['UTC', 'Europe/London', 'Asia/Seoul'], '', january)
     expect(groups.map((g) => g.group)).toEqual(['Asia', 'Europe', 'Other'])
+  })
+})
+
+describe('summarizeDates', () => {
+  it('AC2: consecutive, single, and non-consecutive dates', () => {
+    expect(summarizeDates(['2026-10-20', '2026-10-21', '2026-10-22', '2026-10-23', '2026-10-24'])).toBe('Oct 20 – Oct 24')
+    expect(summarizeDates(['2026-10-22', '2026-10-20', '2026-10-21'])).toBe('Oct 20 – Oct 22')
+    expect(summarizeDates(['2026-10-20'])).toBe('Tue, Oct 20')
+    expect(summarizeDates(['2026-10-20', '2026-10-22', '2026-10-24'])).toBe('3 days')
+    expect(summarizeDates(['2026-10-30', '2026-10-31', '2026-11-01'])).toBe('Oct 30 – Nov 1')
+    expect(summarizeDates([])).toBe('')
   })
 })

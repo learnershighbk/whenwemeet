@@ -146,3 +146,19 @@ export function filterTimezoneGroups(groups: TimezoneGroup[], query: string): Ti
 export function groupTimezones(zones: string[], query = '', at = new Date()): TimezoneGroup[] {
   return filterTimezoneGroups(buildTimezoneGroups(zones, at), query)
 }
+
+// ─── Event header ───────────────────────────────────────
+
+/** 'Oct 20 – Oct 24' (consecutive) · 'Tue, Oct 20' (one day) · '5 days' (gaps) */
+export function summarizeDates(dates: DateKey[]): string {
+  if (dates.length === 0) return ''
+  const sorted = [...dates].sort()
+  const fmt = (key: DateKey, opts: Intl.DateTimeFormatOptions) =>
+    parseKey(key).toLocaleDateString('en-US', opts)
+  if (sorted.length === 1) return fmt(sorted[0], { weekday: 'short', month: 'short', day: 'numeric' })
+  const consecutive = expandRange(sorted[0], sorted[sorted.length - 1]).length === sorted.length
+  if (consecutive) {
+    return `${fmt(sorted[0], { month: 'short', day: 'numeric' })} – ${fmt(sorted[sorted.length - 1], { month: 'short', day: 'numeric' })}`
+  }
+  return `${sorted.length} days`
+}

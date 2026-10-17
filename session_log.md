@@ -137,3 +137,56 @@ http://localhost:5173 확인했어. spec 02 작업 진행하라
 ## 2026-10-17 18:16:59
 
 위 사항 승인할께 커밋하라. tasks.md를 쓰고 구현을 시작하라. 구현에 문제가 없으면 추가 터미널 열어서 병렬작업 진행하라
+
+---
+
+## 2026-10-17 18:20:03
+
+<task-notification>
+<task-id>af5389164187e8fe8</task-id>
+<tool-use-id>toolu_017bLbqz4VSB3B1BeL9Xehth</tool-use-id>
+<output-file>C:\Users\KDIS\AppData\Local\Temp\claude\D-----03--AI-Projects-whenwemeet\04b42da4-6787-4b76-a7eb-edea6d87617e\tasks\af5389164187e8fe8.output</output-file>
+<status>completed</status>
+<summary>Agent "Draft Spec 04 availability" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Drafted `specs/04-availability/spec.md` (only file touched; no git, no npm).
+
+Summary:
+- Sections 1–5 in the Spec 02/03 format: scope (P2 name-hover highlight excluded), ASCII layout (Best time full-width → My | Group on desktop; stacked on mobile; sign-in form occupies My column before login), R1–R8 covering `countBySlot`/`bestSlot`, `select` mode, 300 ms debounced autosave state machine (`Saving…`/`Saved`/retry ×5 → manual Retry; `not_allowed` → clear session + `Please sign in again.`), 5-level heatmap by ratio with legend, hover tooltip (`pointer: fine`) vs. tap/focus detail panel (`pointer: coarse`), Best time card + green outline on the grid cell, `Responses (n)` list, realtime hook with `Reconnecting…` banner and reload on resubscribe.
+- AC1–AC12 with 확인 방법 (unit tests for `bestSlot`/`countBySlot`/`heatLevel`; manual for UI, 2-browser realtime, DevTools offline, token-tamper → re-sign-in).
+- 구현 메모: file list, discriminated-union `Grid` props for `block | select | heatmap` that reuses the existing `paint` ref drag logic (select skips blocked cells; heatmap doesn't paint, uses `aria-describedby`), autosave state machine, tooltip positioning, re-fetch on `SUBSCRIBED` to avoid gaps.
+- Section 6 확인 필요 (Q1–Q7): own-cell marker in heatmap (propose none), zero-slot participants count in total (propose yes), ratio vs. absolute heat thresholds (propose ratio), tooltip vs. panel on touch (propose panel), tie annotation for Best time (propose none), retry policy (2 s × 5), Best-time cell outline on grid (propose yes — not in PRD).
+
+Noted in passing (out of scope): `src/lib/api.ts` and `tests/dates.test.ts` changed on disk during my run — presumably the main session's Spec 03 work; I did not touch them.</result>
+<usage><subagent_tokens>285947</subagent_tokens><tool_uses>1</tool_uses><duration_ms>106585</duration_ms></usage>
+</task-notification>
+
+---
+
+## 2026-10-17 18:20:25
+
+Chrome 확장은 연결되어 있는 상태야. 연결 안되면 연결하는 방법 알려줘
+
+---
+
+## 2026-10-17 18:21:25
+
+<task-notification>
+<task-id>b93y6v6ck</task-id>
+<tool-use-id>toolu_01Mm3EQa3pukTyufK4ZuxxWp</tool-use-id>
+<output-file>C:\Users\KDIS\AppData\Local\Temp\claude\D-----03--AI-Projects-whenwemeet\04b42da4-6787-4b76-a7eb-edea6d87617e\tasks\b93y6v6ck.output</output-file>
+<status>failed</status>
+<summary>Background command "Start Vite dev server on port 5173" failed with exit code 127</summary>
+</task-notification>
+
+---
+
+## 2026-10-17 18:26:40
+
+테스트용 이벤트에서 로그인은 되는데 생성된 일정 그리드가 나오지 않고 있어. 오류가 맞는지 확인하고 원인을 파악하여 수정하라
+
+---
+
+## 2026-10-17 18:28:13
+
+Spec 03 커밋하고 Spec 04 승인한다. 다음 작업 진행하라
