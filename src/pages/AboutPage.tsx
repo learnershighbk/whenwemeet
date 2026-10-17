@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import PageHeader, { PageBody } from '../components/PageHeader'
+import { CONTACT_EMAIL } from '../App'
 
 const ORGANIZER_STEPS = [
   ['Name your event', 'Give the meeting a short name.'],
@@ -46,6 +47,18 @@ export default function AboutPage() {
             </div>
           ))}
         </dl>
+      </section>
+
+      <section className="card mb-10 p-5 sm:p-6">
+        <p className="eyebrow mb-1">Feedback</p>
+        <h2 className="mb-2 text-lg font-semibold">Found a bug or have an idea?</h2>
+        <p className="text-sm text-muted">
+          Email{' '}
+          <a href={`mailto:${CONTACT_EMAIL}?subject=WhenWeMeet%20feedback`} className="btn-link">
+            {CONTACT_EMAIL}
+          </a>
+          . Please include the event link if it&apos;s about a specific event.
+        </p>
       </section>
 
       <div className="text-center">

@@ -3,6 +3,8 @@ import AboutPage from './pages/AboutPage'
 import CreatePage from './pages/CreatePage'
 import EventPage from './pages/EventPage'
 
+export const CONTACT_EMAIL = 'leanershigh@gmail.com'
+
 const navLink = ({ isActive }: { isActive: boolean }) =>
   `text-sm transition-colors ${isActive ? 'font-medium text-nav-fg' : 'text-nav-muted hover:text-nav-fg'}`
 
@@ -32,8 +34,16 @@ export default function App() {
           <Route path="/e/:id" element={<EventPage />} />
         </Routes>
       </div>
-      <footer className="border-t border-line py-5 text-center text-xs text-faint">
-        WhenWeMeet · Find the time that works for everyone.
+      <footer className="border-t border-line py-5 text-xs text-faint">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-1.5 px-4 text-center sm:flex-row sm:justify-between sm:text-left">
+          <span>WhenWeMeet · Find the time that works for everyone.</span>
+          <span>
+            Suggestions or bug reports:{' '}
+            <a href={`mailto:${CONTACT_EMAIL}?subject=WhenWeMeet%20feedback`} className="text-muted hover:text-ink hover:underline">
+              {CONTACT_EMAIL}
+            </a>
+          </span>
+        </div>
       </footer>
     </div>
   )
