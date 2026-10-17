@@ -26,7 +26,8 @@
 | `components/*` (기타) | Calendar, TimezoneSelect, SignInForm, BestTime — 화면 조각 | — |
 | `lib/dates` | 이벤트 입력용 날짜·시간 계산: 날짜 범위 펼치기, 31일 제한, 시간 선택지·라벨, 타임존 목록 | 없음 (순수 함수) |
 | `lib/slots` | 칸 목록 생성, 칸별 인원 집계, Best time 계산, 시간 포맷 | lib/dates |
-| `lib/api` | Supabase 호출 (이벤트 생성·조회, 로그인, 응답 저장) | lib/supabase |
+| `lib/api` | Supabase 호출 (이벤트 생성·조회, 로그인, 응답 저장), DB 행 → 앱 타입 변환 | lib/supabase |
+| `lib/session` | 참가자 로그인 정보(participantId, token, name)를 localStorage에 이벤트별로 저장·읽기·삭제. 저장소 접근 실패는 무시 | 없음 |
 | `hooks/useEventRealtime` | 이벤트의 응답 목록 최초 로드 + 실시간 구독 | lib/api |
 
 ## 3. 칸(slot) 모델
@@ -102,5 +103,6 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 |---|---|
 | 2026-10-17 | v1.0 확정 |
 | 2026-10-17 | `lib/dates` 모듈 추가 (Spec 01). 날짜 입력 계산을 `lib/slots`에서 분리 |
+| 2026-10-17 | `lib/session` 모듈 추가 (Spec 03). 로그인 유지 저장소 접근을 한곳에 모음 |
 - RPC: `supabase/migrations`의 SQL을 로컬/개발 프로젝트에 적용 후 수동 확인.
 - 화면: spec의 AC별 수동 확인 절차를 `tasks.md`에 기록 (데스크톱 + 375px 모바일, 브라우저 2개로 실시간 확인).
