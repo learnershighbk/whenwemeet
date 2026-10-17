@@ -1,7 +1,7 @@
 // All Supabase calls live here (CLAUDE.md). Components never call supabase directly.
 
 import type { DateKey, EventDraft } from './dates'
-import type { SlotKey, SlotMinutes } from './slots'
+import type { Response, SlotKey, SlotMinutes } from './slots'
 import { supabase } from './supabase'
 
 export type Event = {
@@ -92,4 +92,78 @@ export async function joinEvent(
     .eq('participant_id', row.participant_id)
     .maybeSingle()
   return { participantId: row.participant_id, token: row.token, name: av?.name ?? name }
+}
+
+// ─── Availability (specs/04-availability R3, R8) ─────────
+
+export type SaveErrorCode = 'not_allowed' | 'unknown'
+
+export class SaveError extends Error {
+  constructor(public code: SaveErrorCode) {
+    super(code)
+  }
+}
+
+type AvailabilityRow = { participant_id: string; name: string; slots: SlotKey[] | null }
+
+const toResponse = (row: AvailabilityRow): Response => ({
+  participantId: row.participant_id,
+  name: row.name,
+  slots: row.slots ?? [],
+})
+
+/** Every response for the event — one row per participant, including those with no slots yet. */
+export async function listAvailability(eventId: string): Promise<Response[]> {
+  const { data, error } = await supabase
+    .from('availability')
+    .select('participant_id, name, slots')
+    .eq('event_id', eventId)
+  if (error) throw error
+  return (data as AvailabilityRow[]).map(toResponse)
+}
+
+/** Saves the participant's slots via RPC save_availability. Throws SaveError('not_allowed') on a bad token. */
+export async function saveAvailability(participantId: string, token: string, slots: SlotKey[]): Promise<void> {
+  const { error } = await supabase.rpc('save_availability', {
+    p_participant_id: participantId,
+    p_token: token,
+    p_slots: slots,
+  })
+  if (error) throw new SaveError(error.message.includes('not_allowed') ? 'not_allowed' : 'unknown')
+}
+
+export type AvailabilityChange =
+  | { type: 'upsert'; response: Response }
+  | { type: 'delete'; participantId: string }
+
+export type ChannelStatus = 'SUBSCRIBED' | 'CHANNEL_ERROR' | 'TIMED_OUT' | 'CLOSED'
+
+/**
+ * Realtime changes to the event's availability rows. Returns an unsubscribe function.
+ * supabase-js reconnects on its own; onStatus reports each transition so the caller can reload on SUBSCRIBED.
+ */
+export function subscribeAvailability(
+  eventId: string,
+  onChange: (change: AvailabilityChange) => void,
+  onStatus: (status: ChannelStatus) => void,
+): () => void {
+  const channel = supabase
+    .channel(`event:${eventId}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'availability', filter: `event_id=eq.${eventId}` },
+      (payload) => {
+        if (payload.eventType === 'DELETE') {
+          // `old` carries only the primary key unless REPLICA IDENTITY FULL is set
+          const id = (payload.old as Partial<AvailabilityRow>).participant_id
+          if (id) onChange({ type: 'delete', participantId: id })
+          return
+        }
+        onChange({ type: 'upsert', response: toResponse(payload.new as AvailabilityRow) })
+      },
+    )
+    .subscribe((status) => onStatus(status as ChannelStatus))
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }

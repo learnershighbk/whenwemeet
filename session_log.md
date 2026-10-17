@@ -190,3 +190,38 @@ Chrome 확장은 연결되어 있는 상태야. 연결 안되면 연결하는 �
 ## 2026-10-17 18:28:13
 
 Spec 03 커밋하고 Spec 04 승인한다. 다음 작업 진행하라
+
+---
+
+## 2026-10-17 18:32:02
+
+<task-notification>
+<task-id>a012995cdecf54a3b</task-id>
+<tool-use-id>toolu_01QQPr2Y4YzAoW62iybKyeUV</tool-use-id>
+<output-file>C:\Users\KDIS\AppData\Local\Temp\claude\D-----03--AI-Projects-whenwemeet\04b42da4-6787-4b76-a7eb-edea6d87617e\tasks\a012995cdecf54a3b.output</output-file>
+<status>completed</status>
+<summary>Agent "Spec 04 data layer" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Spec 04 data layer (T1–T4) done; UI files and git untouched.
+
+**Added**
+- `src/lib/slots.ts`: `Response`, `countBySlot`, `bestSlot`, `heatLevel` — signatures exactly as specified.
+- `src/lib/api.ts`: `SaveError`/`SaveErrorCode`, `listAvailability`, `saveAvailability`, plus `subscribeAvailability(eventId, onChange, onStatus)` (channel `event:{id}`, `postgres_changes` filtered by `event_id`; DELETE uses `old.participant_id`). `supabase` stays imported only in `lib/api.ts`.
+- `src/hooks/useEventRealtime.ts`: loads once, subscribes via `subscribeAvailability`, reloads on every `SUBSCRIBED` → `'live'`, other statuses → `'reconnecting'`, unmount guard + `removeChannel`.
+- `tests/slots.test.ts`: +7 tests → **27 passing**. `npx tsc -b --noEmit` exits 0 against the current UI files (including the in-progress `EventPage.tsx`).
+
+**UI side must know**
+- `bestSlot` tie-break is **chronological by slot key**, not rows order: rows are time-major, so `10/21 10:00` would otherwise beat `10/20 10:30`. Spec 04 R1 text ("`rows` 순서(이른 날짜 → 이른 시간)") is internally inconsistent — the "earliest date then time" reading is implemented; R1 wording should be corrected to say chronological order.
+- `countBySlot` omits blocked keys entirely (`Map.has(key) === false`), so use `counts.get(key) ?? []`.
+- `heatLevel` returns 0 for `total === 0`, so a legend/heat class never needs a divide-by-zero guard.
+- `useEventRealtime` resets `responses` to `[]` and status to `'loading'` whenever `eventId` changes.
+
+Out of scope, noticed: the first attempt wrote nothing because a single large bash heredoc chain hit a quoting error — nothing was partially applied; all files were then written with Edit/Write.</result>
+<usage><subagent_tokens>329248</subagent_tokens><tool_uses>16</tool_uses><duration_ms>166544</duration_ms></usage>
+</task-notification>
+
+---
+
+## 2026-10-17 18:37:40
+
+다 점검했어. 커밋하고 다음단계 진행항라

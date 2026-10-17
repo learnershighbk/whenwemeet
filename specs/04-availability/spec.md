@@ -44,7 +44,7 @@ type Response = { participantId: string; name: string; slots: SlotKey[] }
 countBySlot(responses, blocked: Set<SlotKey>): Map<SlotKey, string[]>  // 칸별 가능자 이름(알파벳순). 막힌 칸은 제외
 bestSlot(rows, responses, blocked): { key, available: string[], unavailable: string[] } | null
 ```
-- `bestSlot`: 막히지 않은 칸 중 가능 인원 최다 칸 1개. 동점이면 `rows` 순서(이른 날짜 → 이른 시간)에서 먼저 나오는 칸. 모든 칸이 0명이면 `null`.
+- `bestSlot`: 막히지 않은 칸 중 가능 인원 최다 칸 1개. 동점이면 시간순으로 가장 이른 칸(이른 날짜 → 이른 시간; 칸 키 `YYYY-MM-DDTHH:mm` 오름차순). `rows`는 시간 행 순서라 그대로 쓰면 날짜보다 시각이 우선되므로 쓰지 않는다. 모든 칸이 0명이면 `null`.
 - 참가자의 `slots`에 막힌 칸이 섞여 있어도(서버가 걸러주지만) 집계에서 무시.
 - 이름 정렬: `localeCompare`, 대소문자 무시.
 

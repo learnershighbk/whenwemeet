@@ -73,3 +73,68 @@ export function slotRangeLabel(key: SlotKey, slotMinutes: SlotMinutes): string {
       : `${start.text} ${start.period}–${end.text} ${end.period}`
   return `${weekday}, ${day} · ${range}`
 }
+
+// ─── Aggregation (specs/04-availability R1) ─────────────
+
+export type Response = { participantId: string; name: string; slots: SlotKey[] }
+
+const byName = (a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base' })
+
+/** Per-slot available names, sorted. Blocked slots are left out of the Map entirely. */
+export function countBySlot(responses: Response[], blocked: Set<SlotKey>): Map<SlotKey, string[]> {
+  const map = new Map<SlotKey, string[]>()
+  for (const r of responses) {
+    for (const key of r.slots) {
+      if (blocked.has(key)) continue
+      const names = map.get(key)
+      if (names) names.push(r.name)
+      else map.set(key, [r.name])
+    }
+  }
+  for (const names of map.values()) names.sort(byName)
+  return map
+}
+
+/**
+ * Slot with the most available people among non-blocked slots.
+ * Ties → chronologically earliest (earliest date, then earliest time; slot keys sort that way).
+ * null when every slot has 0.
+ */
+export function bestSlot(
+  rows: SlotRow[],
+  responses: Response[],
+  blocked: Set<SlotKey>,
+): { key: SlotKey; available: string[]; unavailable: string[] } | null {
+  const counts = countBySlot(responses, blocked)
+  let best: { key: SlotKey; available: string[] } | null = null
+  for (const row of rows) {
+    for (const slot of row.slots) {
+      if (blocked.has(slot.key)) continue
+      const available = counts.get(slot.key) ?? []
+      if (available.length === 0) continue
+      const better =
+        !best ||
+        available.length > best.available.length ||
+        (available.length === best.available.length && slot.key < best.key)
+      if (better) best = { key: slot.key, available }
+    }
+  }
+  if (!best) return null
+  const availableSet = new Set(best.available)
+  const unavailable = responses
+    .map((r) => r.name)
+    .filter((n) => !availableSet.has(n))
+    .sort(byName)
+  return { ...best, unavailable }
+}
+
+/** 0 when nobody is available (or nobody has joined); otherwise 1–5 by ratio count/total in 20% steps */
+export function heatLevel(count: number, total: number): 0 | 1 | 2 | 3 | 4 | 5 {
+  if (count <= 0 || total <= 0) return 0
+  const r = count / total
+  if (r <= 0.2) return 1
+  if (r <= 0.4) return 2
+  if (r <= 0.6) return 3
+  if (r <= 0.8) return 4
+  return 5
+}

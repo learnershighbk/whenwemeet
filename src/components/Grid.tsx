@@ -1,23 +1,48 @@
 import { useEffect, useRef } from 'react'
 import type { DateKey } from '../lib/dates'
-import { type SlotKey, type SlotMinutes, type SlotRow, dateHeader, rowLabel, slotRangeLabel } from '../lib/slots'
+import {
+  type SlotKey,
+  type SlotMinutes,
+  type SlotRow,
+  dateHeader,
+  heatLevel,
+  rowLabel,
+  slotRangeLabel,
+} from '../lib/slots'
 
-type Props = {
-  dates: DateKey[]
-  rows: SlotRow[]
-  slotMinutes: SlotMinutes
-  mode: 'block'
-  blocked: Set<SlotKey>
-  onBlockedChange: (next: Set<SlotKey>) => void
-}
+type Common = { dates: DateKey[]; rows: SlotRow[]; slotMinutes: SlotMinutes; blocked: Set<SlotKey> }
+
+export type GridProps =
+  | (Common & { mode: 'block'; onBlockedChange: (next: Set<SlotKey>) => void })
+  | (Common & { mode: 'select'; selected: Set<SlotKey>; onSelectedChange: (next: Set<SlotKey>) => void })
+  | (Common & {
+      mode: 'heatmap'
+      counts: Map<SlotKey, string[]>
+      total: number
+      /** Best time cell — green outline */
+      highlight?: SlotKey | null
+      /** Cell chosen by tap/focus — for the detail panel */
+      activeCell?: SlotKey | null
+      onCellHover?: (key: SlotKey | null, rect: DOMRect | null) => void
+      onCellTap?: (key: SlotKey) => void
+    })
 
 const HATCH = 'repeating-linear-gradient(135deg, transparent 0 4px, rgba(0,0,0,0.08) 4px 6px)'
+const HEAT_BG = ['bg-white', 'bg-heat-1', 'bg-heat-2', 'bg-heat-3', 'bg-heat-4', 'bg-heat-5']
 
-export default function Grid({ dates, rows, slotMinutes, blocked, onBlockedChange }: Props) {
-  // Drag painting: every cell touched during one drag gets the same state as the first one
+export default function Grid(props: GridProps) {
+  const { dates, rows, slotMinutes, blocked, mode } = props
+
+  // Painting (block + select): every cell touched during one drag gets the state of the first cell
+  const paintable = mode !== 'heatmap'
+  const current = mode === 'block' ? props.blocked : mode === 'select' ? props.selected : null
+  const emit = (next: Set<SlotKey>) => {
+    if (props.mode === 'block') props.onBlockedChange(next)
+    else if (props.mode === 'select') props.onSelectedChange(next)
+  }
   const paint = useRef<{ on: boolean; set: Set<SlotKey> } | null>(null)
-  const latest = useRef(blocked)
-  latest.current = blocked
+  const latest = useRef(current)
+  latest.current = current
 
   useEffect(() => {
     const stop = () => (paint.current = null)
@@ -29,19 +54,20 @@ export default function Grid({ dates, rows, slotMinutes, blocked, onBlockedChang
     }
   }, [])
 
+  const skip = (key: SlotKey) => mode === 'select' && blocked.has(key)
+
   function apply(key: SlotKey) {
     const p = paint.current
-    if (!p || p.set.has(key) === p.on) return
+    if (!p || skip(key) || p.set.has(key) === p.on) return
     p.set = new Set(p.set)
     if (p.on) p.set.add(key)
     else p.set.delete(key)
-    onBlockedChange(p.set)
+    emit(p.set)
   }
 
   function onPointerDown(e: React.PointerEvent, key: SlotKey) {
-    if (e.button !== 0) return
+    if (!paintable || !latest.current || e.button !== 0 || skip(key)) return
     e.preventDefault()
-    // Let pointermove reach whatever cell is under the finger
     ;(e.target as Element).releasePointerCapture?.(e.pointerId)
     paint.current = { on: !latest.current.has(key), set: latest.current }
     apply(key)
@@ -54,17 +80,21 @@ export default function Grid({ dates, rows, slotMinutes, blocked, onBlockedChang
   }
 
   function toggle(key: SlotKey) {
-    const next = new Set(blocked)
+    if (!current || skip(key)) return
+    const next = new Set(current)
     if (next.has(key)) next.delete(key)
     else next.add(key)
-    onBlockedChange(next)
+    emit(next)
   }
 
   const rowHeight = slotMinutes === 30 ? 24 : 16
   const columns = `2.75rem repeat(${dates.length}, minmax(var(--cell-w), 120px))`
 
   return (
-    <div className="overflow-x-auto overscroll-x-contain [--cell-w:40px] sm:[--cell-w:48px]">
+    <div
+      className="overflow-x-auto overscroll-x-contain [--cell-w:40px] sm:[--cell-w:48px]"
+      onPointerLeave={() => props.mode === 'heatmap' && props.onCellHover?.(null, null)}
+    >
       <div className="grid w-max min-w-full" style={{ gridTemplateColumns: columns }}>
         {/* Header */}
         <div className="sticky left-0 z-10 bg-white" />
@@ -90,35 +120,82 @@ export default function Grid({ dates, rows, slotMinutes, blocked, onBlockedChang
                 <span className="relative -top-1.5">{rowLabel(row.minute)}</span>
               </div>
               {row.slots.map((slot, c) => {
-                const isBlocked = blocked.has(slot.key)
+                const key = slot.key
+                const isBlocked = blocked.has(key)
+                const label = slotRangeLabel(key, slotMinutes)
+                const edges = [
+                  'border-l border-t border-line',
+                  c === row.slots.length - 1 && 'border-r',
+                  r === rows.length - 1 && 'border-b',
+                ]
+                const borderStyle = { borderTopStyle: onHour || r === 0 ? 'solid' : 'dashed' } as const
+
+                if (props.mode === 'heatmap') {
+                  const names = props.counts.get(key) ?? []
+                  const level = isBlocked ? 0 : heatLevel(names.length, props.total)
+                  const active = props.activeCell === key
+                  const best = props.highlight === key
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      data-slot={key}
+                      disabled={isBlocked}
+                      aria-label={isBlocked ? `${label}, blocked` : `${label}, ${names.length} of ${props.total} available`}
+                      onPointerEnter={(e) => !isBlocked && props.onCellHover?.(key, e.currentTarget.getBoundingClientRect())}
+                      onClick={() => !isBlocked && props.onCellTap?.(key)}
+                      onFocus={() => !isBlocked && props.onCellTap?.(key)}
+                      className={[
+                        ...edges,
+                        'relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
+                        isBlocked ? 'bg-blocked' : HEAT_BG[level],
+                        best && 'z-10 outline-2 -outline-offset-2 outline-pick',
+                        active && !best && 'z-10 outline-2 -outline-offset-2 outline-ink',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      style={{ height: rowHeight, ...borderStyle, backgroundImage: isBlocked ? HATCH : undefined }}
+                    />
+                  )
+                }
+
+                const on = current!.has(key)
+                const disabled = mode === 'select' && isBlocked
                 return (
                   <button
-                    key={slot.key}
+                    key={key}
                     type="button"
-                    data-slot={slot.key}
-                    aria-pressed={isBlocked}
-                    aria-label={`${slotRangeLabel(slot.key, slotMinutes)}${isBlocked ? ', blocked' : ''}`}
-                    onPointerDown={(e) => onPointerDown(e, slot.key)}
+                    data-slot={key}
+                    aria-pressed={on}
+                    aria-disabled={disabled || undefined}
+                    aria-label={
+                      mode === 'block'
+                        ? `${label}${on ? ', blocked' : ''}`
+                        : isBlocked
+                          ? `${label}, blocked`
+                          : `${label}, ${on ? 'available' : 'not available'}`
+                    }
+                    onPointerDown={(e) => onPointerDown(e, key)}
                     onPointerMove={onPointerMove}
                     onKeyDown={(e) => {
                       if (e.key === ' ' || e.key === 'Enter') {
                         e.preventDefault()
-                        toggle(slot.key)
+                        toggle(key)
                       }
                     }}
                     className={[
-                      'touch-none select-none border-line focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
-                      'border-l border-t',
-                      c === row.slots.length - 1 && 'border-r',
-                      r === rows.length - 1 && 'border-b',
-                      isBlocked ? 'bg-blocked' : 'bg-white hover:bg-line/40',
+                      ...edges,
+                      'touch-none select-none focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
+                      disabled && 'cursor-not-allowed',
+                      mode === 'block' && (on ? 'bg-blocked' : 'bg-white hover:bg-line/40'),
+                      mode === 'select' && (isBlocked ? 'bg-blocked' : on ? 'bg-pick' : 'bg-white hover:bg-line/40'),
                     ]
                       .filter(Boolean)
                       .join(' ')}
                     style={{
                       height: rowHeight,
-                      borderTopStyle: onHour || r === 0 ? 'solid' : 'dashed',
-                      backgroundImage: isBlocked ? HATCH : undefined,
+                      ...borderStyle,
+                      backgroundImage: (mode === 'block' && on) || (mode === 'select' && isBlocked) ? HATCH : undefined,
                     }}
                   />
                 )
