@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router'
 import BestTime from '../components/BestTime'
 import Grid from '../components/Grid'
 import HeatLegend from '../components/HeatLegend'
+import PageHeader, { PageBody } from '../components/PageHeader'
 import SignInForm from '../components/SignInForm'
 import SlotDetail from '../components/SlotDetail'
 import { useEventRealtime } from '../hooks/useEventRealtime'
@@ -36,7 +37,7 @@ export default function EventPage() {
     return (
       <Centered>
         <p className="mb-4">This event doesn't exist. Check the link and try again.</p>
-        <Link to="/" className="underline underline-offset-4">
+        <Link to="/" className="btn-link">
           Plan a new meeting
         </Link>
       </Centered>
@@ -126,39 +127,51 @@ function EventBody({ event }: { event: Event }) {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{event.title}</h1>
-        <p className="mt-1 text-muted">
-          {summarizeDates(event.dates)} · {hourLabel(event.startHour)} – {hourLabel(event.endHour)}
-        </p>
-        <p className="text-sm text-muted">Times are in {timezoneLabel(event.timezone)}</p>
-      </header>
-
+    <>
+      <PageHeader
+        title={event.title}
+        meta={
+          <>
+            {summarizeDates(event.dates)} · {hourLabel(event.startHour)} – {hourLabel(event.endHour)} · Times are in{' '}
+            {timezoneLabel(event.timezone)}
+          </>
+        }
+      >
+        <dl className="grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3">
+          <Stat label="Responses" value={String(total)} />
+          <Stat label="Best time" value={best ? slotRangeLabel(best.key, event.slotMinutes).split(' · ')[1] : '—'} sub={best ? slotRangeLabel(best.key, event.slotMinutes).split(' · ')[0] : undefined} />
+          <Stat label="Available" value={best ? `${best.available.length} of ${total}` : '—'} />
+        </dl>
+      </PageHeader>
+      <PageBody>
       {status === 'reconnecting' && (
-        <div role="status" className="mb-4 rounded-lg border border-line bg-line-soft px-4 py-2 text-sm">
+        <div role="status" className="mb-4 rounded-md border border-line bg-line-soft px-4 py-2 text-sm">
           Reconnecting…
         </div>
       )}
 
-      <div className="mb-8">
+      <div className="mb-6">
         <BestTime best={best} total={total} slotMinutes={event.slotMinutes} />
       </div>
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* My column */}
-        <section aria-label="My availability" className="card p-4 sm:p-6">
-          <h2 className="mb-3 text-lg font-semibold">My availability</h2>
+        <section aria-label="My availability" className="card">
+          <div className="card-head">
+            <h2 className="font-semibold">My availability</h2>
+            {session && (
+              <p className="truncate text-sm text-muted">
+                <span className="font-medium text-ink">{session.name}</span>
+                <span className="mx-1.5 text-line">|</span>
+                <button type="button" onClick={signOut} className="btn-link text-sm">
+                  Sign out
+                </button>
+              </p>
+            )}
+          </div>
+          <div className="p-4 sm:p-6">
           {session ? (
             <>
-              <div className="mb-3 flex items-baseline justify-between gap-3 text-sm">
-                <p>
-                  Signed in as <span className="font-medium">{session.name}</span>
-                </p>
-                <button type="button" onClick={signOut} className="text-muted underline underline-offset-4 hover:text-ink">
-                  Not you? Sign out
-                </button>
-              </div>
               <p className="mb-3 text-sm text-muted">Tap or drag to mark when you're free.</p>
               <Grid
                 dates={event.dates}
@@ -176,7 +189,7 @@ function EventBody({ event }: { event: Event }) {
                 {save.state === 'failed' && (
                   <>
                     Couldn't save. Check your connection and try again.{' '}
-                    <button type="button" onClick={save.retry} className="underline underline-offset-4 text-ink">
+                    <button type="button" onClick={save.retry} className="btn-link">
                       Retry
                     </button>
                   </>
@@ -193,14 +206,16 @@ function EventBody({ event }: { event: Event }) {
               <SignInForm onJoin={join} />
             </>
           )}
+          </div>
         </section>
 
         {/* Group column */}
-        <section aria-label="Group availability" className="card p-4 sm:p-6">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="text-lg font-semibold">Group availability</h2>
+        <section aria-label="Group availability" className="card">
+          <div className="card-head">
+            <h2 className="font-semibold">Group availability</h2>
             <span className="text-sm text-muted">Responses ({total})</span>
           </div>
+          <div className="p-4 sm:p-6">
           <Grid
             dates={event.dates}
             rows={rows}
@@ -218,7 +233,7 @@ function EventBody({ event }: { event: Event }) {
           <HeatLegend total={total} />
 
           {activeCell && total > 0 && (
-            <div className="mt-4 rounded-lg border border-line bg-line-soft/60 p-3">
+            <div className="mt-4 rounded-md border border-line bg-line-soft/60 p-3">
               <SlotDetail {...detailFor(activeCell)} />
             </div>
           )}
@@ -233,11 +248,23 @@ function EventBody({ event }: { event: Event }) {
               ))}
             </p>
           )}
+          </div>
         </section>
       </div>
 
       {hover && total > 0 && <Tooltip rect={hover.rect}>{<SlotDetail {...detailFor(hover.key)} />}</Tooltip>}
-    </main>
+      </PageBody>
+    </>
+  )
+}
+
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="stat">
+      <dt className="eyebrow truncate">{label}</dt>
+      <dd className="truncate text-base font-semibold tabular-nums sm:text-lg">{value}</dd>
+      {sub && <dd className="truncate text-xs text-muted">{sub}</dd>}
+    </div>
   )
 }
 
@@ -340,7 +367,7 @@ function Tooltip({ rect, children }: { rect: DOMRect; children: React.ReactNode 
   return (
     <div
       role="tooltip"
-      className="pointer-events-none fixed z-50 rounded-lg border border-line bg-card p-3 shadow-lg"
+      className="pointer-events-none fixed z-50 rounded-md border border-line bg-card p-3 shadow-lg"
       style={{ width, left, top: above ? rect.top - 8 : rect.bottom + 8, transform: above ? 'translateY(-100%)' : undefined }}
     >
       {children}

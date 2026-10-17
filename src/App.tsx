@@ -3,25 +3,25 @@ import AboutPage from './pages/AboutPage'
 import CreatePage from './pages/CreatePage'
 import EventPage from './pages/EventPage'
 
+const navLink = ({ isActive }: { isActive: boolean }) =>
+  `text-sm transition-colors ${isActive ? 'font-medium text-nav-fg' : 'text-nav-muted hover:text-nav-fg'}`
+
 export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-line bg-card">
+      <header className="bg-nav text-nav-fg">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-sm bg-pick" />
+          <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
+            <span aria-hidden className="inline-block h-3 w-3 rounded-[3px] bg-brand ring-2 ring-white/20" />
             WhenWeMeet
           </Link>
-          <nav className="flex items-center gap-5 text-sm">
-            <NavLink
-              to="/about"
-              className={({ isActive }) => (isActive ? 'font-medium text-ink' : 'text-muted hover:text-ink')}
-            >
+          <nav className="flex items-center gap-6">
+            <NavLink to="/about" className={navLink}>
               About
             </NavLink>
-            <Link to="/" className="text-muted hover:text-ink">
+            <NavLink to="/" end className={navLink}>
               New event
-            </Link>
+            </NavLink>
           </nav>
         </div>
       </header>
@@ -32,7 +32,9 @@ export default function App() {
           <Route path="/e/:id" element={<EventPage />} />
         </Routes>
       </div>
-      <footer className="py-6 text-center text-xs text-faint">Find the time that works for everyone.</footer>
+      <footer className="border-t border-line py-5 text-center text-xs text-faint">
+        WhenWeMeet · Find the time that works for everyone.
+      </footer>
     </div>
   )
 }

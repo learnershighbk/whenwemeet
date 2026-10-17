@@ -78,7 +78,7 @@ export default function TimezoneSelect({ value, onChange, id }: Props) {
       </button>
 
       {open && (
-        <div className="absolute z-10 mt-1 w-full rounded-lg border border-line bg-card shadow-lg">
+        <div className="absolute z-10 mt-1 w-full rounded-md border border-line bg-card shadow-lg">
           <div className="border-b border-line p-2">
             <input
               autoFocus

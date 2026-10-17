@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import Calendar, { type CalendarValue } from '../components/Calendar'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Grid from '../components/Grid'
+import PageHeader, { PageBody } from '../components/PageHeader'
 import TimezoneSelect from '../components/TimezoneSelect'
 import {
   DEFAULT_END_HOUR,
@@ -14,6 +15,8 @@ import {
   adjustEndHour,
   defaultTimezone,
   hourLabel,
+  summarizeDates,
+  timezoneLabel,
 } from '../lib/dates'
 import { createEvent } from '../lib/api'
 import { type SlotKey, type SlotMinutes, allSlotKeys, buildSlots } from '../lib/slots'
@@ -53,90 +56,137 @@ export default function CreatePage() {
 
   if (step === 'share' && eventId) return <ShareStep id={eventId} />
 
+  const summary = (
+    <aside className="card lg:sticky lg:top-6">
+      <div className="card-head">
+        <h2 className="font-semibold">Event summary</h2>
+      </div>
+      <dl className="divide-y divide-line-soft text-sm">
+        <SummaryRow label="Event" value={title.trim() || '—'} />
+        <SummaryRow
+          label="Days"
+          value={
+            calendar.dates.length
+              ? `${calendar.dates.length} ${calendar.dates.length === 1 ? 'day' : 'days'} · ${summarizeDates(calendar.dates)}`
+              : '—'
+          }
+        />
+        <SummaryRow label="Hours" value={`${hourLabel(startHour)} – ${hourLabel(endHour)}`} />
+        <SummaryRow label="Time zone" value={timezoneLabel(timezone)} />
+      </dl>
+      <div className="px-4 py-4 sm:px-6">
+        <button type="submit" form="create-form" disabled={!canCreate} className="btn-primary h-12 w-full">
+          Create Event
+        </button>
+        {!canCreate && (
+          <p className="mt-2 text-xs text-faint">Add an event name and pick at least one day.</p>
+        )}
+      </div>
+    </aside>
+  )
+
   return (
-    <main className="mx-auto max-w-xl px-4 py-8 sm:py-12">
-      <h1 className="mb-2 text-2xl font-semibold tracking-tight sm:text-3xl">Plan a meeting</h1>
-      <p className="mb-8 text-muted">Pick the days and hours to ask about, then share one link.</p>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          create()
-        }}
-        className="card divide-y divide-line-soft"
-      >
-        <section className="p-4 sm:p-6">
-          <label htmlFor="title" className="mb-2 block font-medium">
-            Event name
-          </label>
-          <input
-            id="title"
-            value={title}
-            maxLength={MAX_TITLE}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Weekly team sync"
-            autoComplete="off"
-            className="field h-11 w-full"
-          />
-        </section>
-
-        <section className="p-4 sm:p-6">
-          <Calendar value={calendar} onChange={setCalendar} />
-        </section>
-
-        <section className="p-4 sm:p-6">
-          <h2 className="mb-3 font-medium">What times?</h2>
-          <div className="mb-4 grid grid-cols-2 gap-3">
-            <label className="text-sm text-muted">
-              From
-              <select
-                value={startHour}
-                onChange={(e) => {
-                  const start = Number(e.target.value)
-                  setStartHour(start)
-                  setEndHour((end) => adjustEndHour(start, end))
-                }}
-                className="field mt-1 h-11 w-full"
-              >
-                {FROM_HOURS.map((h) => (
-                  <option key={h} value={h}>
-                    {hourLabel(h)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm text-muted">
-              To
-              <select
-                value={endHour}
-                onChange={(e) => setEndHour(Number(e.target.value))}
-                className="field mt-1 h-11 w-full"
-              >
-                {TO_HOURS.map((h) => (
-                  <option key={h} value={h} disabled={h <= startHour}>
-                    {hourLabel(h)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <label htmlFor="timezone" className="mb-1 block text-sm text-muted">
-            Time zone
-          </label>
-          <TimezoneSelect id="timezone" value={timezone} onChange={setTimezone} />
-        </section>
-
-        <section className="p-4 sm:p-6">
-          <button
-            type="submit"
-            disabled={!canCreate}
-            className="btn-primary h-12 w-full"
+    <>
+      <PageHeader
+        width="lg"
+        title="Plan a meeting"
+        meta="Pick the days and hours to ask about, then share one link."
+      />
+      <PageBody width="lg">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <form
+            id="create-form"
+            onSubmit={(e) => {
+              e.preventDefault()
+              create()
+            }}
+            className="card divide-y divide-line-soft"
           >
-            Create Event
-          </button>
-        </section>
-      </form>
-    </main>
+            <section className="p-4 sm:p-6">
+              <p className="eyebrow mb-3">Event</p>
+              <label htmlFor="title" className="mb-2 block font-medium">
+                Event name
+              </label>
+              <input
+                id="title"
+                value={title}
+                maxLength={MAX_TITLE}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Weekly team sync"
+                autoComplete="off"
+                className="field h-11 w-full"
+              />
+            </section>
+
+            <section className="p-4 sm:p-6">
+              <p className="eyebrow mb-3">Dates</p>
+              <Calendar value={calendar} onChange={setCalendar} />
+            </section>
+
+            <section className="p-4 sm:p-6">
+              <p className="eyebrow mb-3">Times</p>
+              <h2 className="mb-3 font-medium">What times?</h2>
+              <div className="mb-4 grid grid-cols-2 gap-3">
+                <label className="text-sm text-muted">
+                  From
+                  <select
+                    value={startHour}
+                    onChange={(e) => {
+                      const start = Number(e.target.value)
+                      setStartHour(start)
+                      setEndHour((end) => adjustEndHour(start, end))
+                    }}
+                    className="field mt-1 h-11 w-full"
+                  >
+                    {FROM_HOURS.map((h) => (
+                      <option key={h} value={h}>
+                        {hourLabel(h)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm text-muted">
+                  To
+                  <select
+                    value={endHour}
+                    onChange={(e) => setEndHour(Number(e.target.value))}
+                    className="field mt-1 h-11 w-full"
+                  >
+                    {TO_HOURS.map((h) => (
+                      <option key={h} value={h} disabled={h <= startHour}>
+                        {hourLabel(h)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <label htmlFor="timezone" className="mb-1 block text-sm text-muted">
+                Time zone
+              </label>
+              <TimezoneSelect id="timezone" value={timezone} onChange={setTimezone} />
+            </section>
+
+            {/* Mobile: the submit lives here; desktop: in the summary panel */}
+            <section className="p-4 sm:p-6 lg:hidden">
+              <button type="submit" disabled={!canCreate} className="btn-primary h-12 w-full">
+                Create Event
+              </button>
+            </section>
+          </form>
+
+          <div className="hidden lg:block">{summary}</div>
+        </div>
+      </PageBody>
+    </>
+  )
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 px-4 py-3 sm:px-6">
+      <dt className="shrink-0 text-faint">{label}</dt>
+      <dd className="text-right font-medium">{value}</dd>
+    </div>
   )
 }
 
@@ -177,22 +227,29 @@ function EditStep({ draft, onBack, onCreated }: {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-      <h1 className="mb-1 text-2xl font-semibold tracking-tight sm:text-3xl">Fine-tune your times</h1>
-      <p className="mb-6 text-sm text-muted">
-        {draft.title} · Times in {draft.timezone}
-      </p>
+    <>
+      <PageHeader
+        width="lg"
+        title="Fine-tune your times"
+        meta={
+          <>
+            {draft.title} · {summarizeDates(draft.dates)} · {hourLabel(draft.startHour)} – {hourLabel(draft.endHour)} ·{' '}
+            {timezoneLabel(draft.timezone)}
+          </>
+        }
+      />
+      <PageBody width="lg">
 
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <span className="text-sm text-muted">Slot size</span>
-        <div className="inline-flex rounded-lg border border-line bg-card p-0.5" role="group" aria-label="Slot size">
+        <div className="inline-flex rounded-md border border-line bg-card p-0.5" role="group" aria-label="Slot size">
           {([30, 15] as const).map((m) => (
             <button
               key={m}
               type="button"
               aria-pressed={slotMinutes === m}
               onClick={() => chooseMinutes(m)}
-              className={`h-9 rounded-md px-3 text-sm font-medium ${slotMinutes === m ? 'bg-ink text-white' : 'text-muted hover:text-ink'}`}
+              className={`h-9 rounded px-3 text-sm font-medium ${slotMinutes === m ? 'bg-brand text-white' : 'text-muted hover:text-ink'}`}
             >
               {m} min
             </button>
@@ -259,7 +316,8 @@ function EditStep({ draft, onBack, onCreated }: {
         onCancel={() => setConfirmFinalize(false)}
         onConfirm={finalize}
       />
-    </main>
+      </PageBody>
+    </>
   )
 }
 
@@ -284,10 +342,11 @@ function ShareStep({ id }: { id: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-xl px-4 py-12 sm:py-20">
+    <>
+      <PageHeader width="md" title="Your event is ready!" meta="Send this link to your participants." />
+      <PageBody width="md">
       <div className="card p-6 sm:p-8">
-      <h1 className="mb-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your event is ready!</h1>
-      <p className="mb-6 text-muted">Send this link to your participants.</p>
+      <p className="eyebrow mb-2">Share link</p>
       <input
         ref={inputRef}
         readOnly
@@ -315,6 +374,7 @@ function ShareStep({ id }: { id: string }) {
         {manual && 'Press Ctrl+C to copy.'}
       </p>
       </div>
-    </main>
+      </PageBody>
+    </>
   )
 }

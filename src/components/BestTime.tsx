@@ -9,8 +9,8 @@ type Props = {
 /** Best time card (specs/04-availability R6) */
 export default function BestTime({ best, total, slotMinutes }: Props) {
   return (
-    <section aria-label="Best time" className="card border-l-4 border-l-pick p-4 sm:p-6">
-      <h2 className="mb-2 text-sm font-medium uppercase tracking-wide text-muted">Best time</h2>
+    <section aria-label="Best time" className="card border-l-4 border-l-brand p-4 sm:p-6">
+      <h2 className="eyebrow mb-2">Best time</h2>
       {best ? (
         <>
           <p className="text-lg font-semibold sm:text-xl">{slotRangeLabel(best.key, slotMinutes)}</p>

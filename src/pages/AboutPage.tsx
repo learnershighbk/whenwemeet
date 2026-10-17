@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import PageHeader, { PageBody } from '../components/PageHeader'
 
 const ORGANIZER_STEPS = [
   ['Name your event', 'Give the meeting a short name.'],
@@ -22,9 +23,10 @@ const FAQ = [
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
-      <h1 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">About WhenWeMeet</h1>
-      <p className="mb-10 text-lg text-muted">
+    <>
+      <PageHeader width="md" title="About WhenWeMeet" meta="One link. Everyone marks when they're free. The best time shows up on its own." />
+      <PageBody width="md">
+      <p className="mb-8 text-lg text-muted">
         WhenWeMeet helps a group find the time that works for the most people. One person sets up the
         options, everyone marks when they&apos;re free, and the best time shows up on its own &mdash; no
         sign-ups, no back-and-forth.
@@ -34,6 +36,7 @@ export default function AboutPage() {
       <Steps title="If you're invited" steps={PARTICIPANT_STEPS} />
 
       <section className="card mb-10 p-5 sm:p-6">
+        <p className="eyebrow mb-1">FAQ</p>
         <h2 className="mb-4 text-lg font-semibold">Good to know</h2>
         <dl className="space-y-4">
           {FAQ.map(([q, a]) => (
@@ -50,20 +53,22 @@ export default function AboutPage() {
           Plan a meeting
         </Link>
       </div>
-    </main>
+      </PageBody>
+    </>
   )
 }
 
 function Steps({ title, steps }: { title: string; steps: string[][] }) {
   return (
     <section className="card mb-6 p-5 sm:p-6">
+      <p className="eyebrow mb-1">How it works</p>
       <h2 className="mb-4 text-lg font-semibold">{title}</h2>
       <ol className="space-y-4">
         {steps.map(([heading, body], i) => (
           <li key={heading} className="flex gap-4">
             <span
               aria-hidden
-              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-pick-soft text-sm font-semibold text-pick"
+              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand"
             >
               {i + 1}
             </span>

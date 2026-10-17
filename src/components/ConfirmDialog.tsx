@@ -31,7 +31,7 @@ export default function ConfirmDialog({ open, message, confirmLabel, busy, busyL
       onClick={(e) => {
         if (e.target === ref.current && !busy) onCancel()
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border border-line bg-card p-0 text-ink shadow-xl backdrop:bg-ink/30"
+      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-md border border-line bg-card p-0 text-ink shadow-xl backdrop:bg-nav/40"
     >
       <div className="p-5">
         <p className="mb-5">{message}</p>

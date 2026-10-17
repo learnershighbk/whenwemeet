@@ -44,7 +44,8 @@ export default function SignInForm({ onJoin }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="card p-4 sm:p-6">
+    <form onSubmit={submit} className="rounded-md border border-line-soft bg-page/60 p-4 sm:p-5">
+      <p className="eyebrow mb-1">Sign in</p>
       <h2 className="mb-4 text-lg font-semibold">Who are you?</h2>
 
       <label htmlFor="name" className="mb-1 block text-sm text-muted">

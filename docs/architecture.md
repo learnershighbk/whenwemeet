@@ -24,7 +24,7 @@
 |---|---|---|
 | `pages/*` | 화면 상태 관리, 컴포넌트 조합 | components, lib, hooks |
 | `components/Grid` | 날짜×시간 그리드 렌더링, 클릭·드래그. `mode`: `block` \| `select` \| `heatmap` | lib/slots |
-| `components/*` (기타) | Calendar, TimezoneSelect, SignInForm, BestTime — 화면 조각 | — |
+| `components/*` (기타) | Calendar, TimezoneSelect, SignInForm, BestTime, HeatLegend, SlotDetail, ConfirmDialog, PageHeader(밴드·본문 컨테이너) — 화면 조각 | — |
 | `lib/dates` | 이벤트 입력용 날짜·시간 계산: 날짜 범위 펼치기, 31일 제한, 시간 선택지·라벨, 타임존 목록 | 없음 (순수 함수) |
 | `lib/slots` | 칸 목록 생성, 칸별 인원 집계, Best time 계산, 시간 포맷 | lib/dates |
 | `lib/api` | Supabase 호출 (이벤트 생성·조회, 로그인, 응답 저장·조회), Realtime 구독 헬퍼 `subscribeAvailability`, DB 행 → 앱 타입 변환. `supabase` 클라이언트를 import하는 유일한 모듈 | lib/supabase |
@@ -110,6 +110,7 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 | 2026-10-17 | Realtime 구독을 `lib/api.subscribeAvailability`로 감싸고 `hooks/useEventRealtime`은 이를 호출 (Spec 04). supabase 클라이언트 접근을 `lib/api`로 한정 |
 | 2026-10-17 | Vercel 프로덕션 배포 (https://whenwemeet-beta.vercel.app). Vite dev 서버 `host: true` |
 | 2026-10-17 | `/about` 라우트 추가 (헤더 메뉴). 정적 소개 페이지 |
+| 2026-10-17 | 디자인 v1.0 (`docs/design.md`): `PageHeader` 밴드 컴포넌트, 생성 화면 2열(요약 패널), 이벤트 요약 스트립 |
 | 2026-10-17 | **보안 구조 변경 (코드 리뷰 F4 #1)**: 테이블 select 정책 제거, 읽기는 RPC `get_event`·`list_availability`, 실시간은 비공개 broadcast 채널. slot 키 서버 검증 추가. `supabase/migrations/002_security.sql` |
 - RPC: `supabase/migrations`의 SQL을 로컬/개발 프로젝트에 적용 후 수동 확인.
 - 화면: spec의 AC별 수동 확인 절차를 `tasks.md`에 기록 (데스크톱 + 375px 모바일, 브라우저 2개로 실시간 확인).

@@ -150,10 +150,10 @@ export default function Grid(props: GridProps) {
                       onFocus={(e) => !isBlocked && e.currentTarget.matches(':focus-visible') && props.onCellFocus?.(key)}
                       className={[
                         ...edges,
-                        'relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
+                        'relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-brand',
                         isBlocked ? 'bg-blocked' : HEAT_BG[level],
                         best && 'z-10 outline-2 -outline-offset-2 outline-pick',
-                        active && !best && 'z-10 outline-2 -outline-offset-2 outline-ink',
+                        active && !best && 'z-10 outline-2 -outline-offset-2 outline-brand',
                       ]
                         .filter(Boolean)
                         .join(' ')}
@@ -188,7 +188,7 @@ export default function Grid(props: GridProps) {
                     }}
                     className={[
                       ...edges,
-                      'touch-none select-none focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',
+                      'touch-none select-none focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-brand',
                       disabled && 'cursor-not-allowed',
                       mode === 'block' && (on ? 'bg-blocked' : 'bg-card hover:bg-line-soft'),
                       mode === 'select' && (isBlocked ? 'bg-blocked' : on ? 'bg-pick' : 'bg-card hover:bg-line-soft'),

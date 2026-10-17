@@ -40,6 +40,7 @@ The app is a static SPA. On Vercel: link the repo, add the two `VITE_SUPABASE_*`
 |---|---|
 | [`docs/prd.md`](docs/prd.md) | Purpose, users, scope, core rules |
 | [`docs/architecture.md`](docs/architecture.md) | Modules, slot model, schema, RLS/RPC, data flow |
+| [`docs/design.md`](docs/design.md) | Design tokens, typography, layout and component rules |
 | [`specs/`](specs/) | One folder per feature: `spec.md` (requirements + acceptance criteria) and `tasks.md` |
 | [`CLAUDE.md`](CLAUDE.md) | Spec-driven workflow rules used to build this |
 
