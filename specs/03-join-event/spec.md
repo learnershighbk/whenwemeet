@@ -44,7 +44,7 @@ Times are in Asia/Seoul (GMT+9)
 - 제목 `Who are you?`, 입력 `Your name`(필수, 최대 30자), `Password (optional)`(type=password).
 - 안내: `No sign-up needed. Add a password only if you want to keep others from editing your times.`
 - `Continue`: 이름(trim)이 비어 있으면 비활성. 처리 중 `Joining…`, 중복 클릭 방지. Enter로 제출.
-- `api.joinEvent(eventId, name, password)` → RPC `join_event`.
+- `api.joinEvent(eventId, name, password)` → RPC `join_event` → `{participant_id, token, display_name}` *(2026-10-17: 표시 이름을 RPC가 함께 반환. availability 직접 조회가 막혔기 때문)*.
 - 오류 문구:
 
 | RPC 오류 | 문구 |

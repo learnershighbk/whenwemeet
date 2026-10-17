@@ -76,7 +76,7 @@ function EventBody({ event }: { event: Event }) {
   const [selected, setSelected] = useState<Set<SlotKey>>(new Set())
   const seeded = useRef<string | null>(null)
   useEffect(() => {
-    if (!session || status === 'loading' || seeded.current === session.participantId) return
+    if (!session || status !== 'live' || seeded.current === session.participantId) return
     const mine = responses.find((r) => r.participantId === session.participantId)
     setSelected(new Set(mine?.slots ?? []))
     seeded.current = session.participantId
@@ -145,7 +145,7 @@ function EventBody({ event }: { event: Event }) {
         <BestTime best={best} total={total} slotMinutes={event.slotMinutes} />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2">
         {/* My column */}
         <section aria-label="My availability">
           <h2 className="mb-3 text-lg font-semibold">My availability</h2>
@@ -212,7 +212,8 @@ function EventBody({ event }: { event: Event }) {
             highlight={best?.key ?? null}
             activeCell={activeCell}
             onCellHover={(key, rect) => finePointer && setHover(key && rect ? { key, rect } : null)}
-            onCellTap={setActiveCell}
+            onCellTap={(key) => !finePointer && setActiveCell(key)}
+            onCellFocus={setActiveCell}
           />
           <HeatLegend total={total} />
 
@@ -267,9 +268,12 @@ function useAutosave(session: Session | null, onExpired: () => void) {
     if (!s || !slots || inFlight.current) return
     pending.current = null
     inFlight.current = true
+    // Result is only meaningful while the same participant is still signed in
+    const stale = () => sessionRef.current?.participantId !== s.participantId
     try {
       await saveAvailability(s.participantId, s.token, slots)
       inFlight.current = false
+      if (stale()) return
       attempts.current = 0
       if (pending.current) {
         void flush()
@@ -279,6 +283,11 @@ function useAutosave(session: Session | null, onExpired: () => void) {
       }
     } catch (err) {
       inFlight.current = false
+      if (stale()) {
+        pending.current = null
+        setState('idle')
+        return
+      }
       if (err instanceof SaveError && err.code === 'not_allowed') {
         pending.current = null
         setState('idle')

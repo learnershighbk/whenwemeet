@@ -78,12 +78,14 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 ## 5. 권한 (RLS + RPC)
 | 테이블 | 클라이언트 직접 접근 | 쓰기 경로 |
 |---|---|---|
-| events | select | RPC `create_event(...)` → id 반환 |
+| events | 없음 — RPC `get_event(id)`로만 조회 | RPC `create_event(...)` → id 반환 |
 | participants | 없음 | RPC `join_event(event_id, name, password)` |
-| availability | select (실시간 구독 포함) | RPC `save_availability(participant_id, token, slots)` |
+| availability | 없음 — RPC `list_availability(event_id)`로만 조회. 실시간은 비공개 broadcast 토픽 `event:<id>` (트리거 `availability_broadcast` → `realtime.broadcast_changes`) | RPC `save_availability(participant_id, token, slots)` |
 
-- `join_event`: 이름 없으면 participant + 빈 availability 생성. 있으면 비밀번호 확인(`pgcrypto` 해시). 성공 시 `{participant_id, token}` 반환, 실패 시 `wrong_password` 오류.
-- `save_availability`: token이 맞을 때만 저장, blocked 칸은 서버에서 제거.
+- `join_event`: 이름 없으면 participant + 빈 availability 생성. 있으면 비밀번호 확인(`pgcrypto` 해시). 성공 시 `{participant_id, token, display_name}` 반환, 실패 시 `wrong_password` 오류.
+- `save_availability`: token이 맞을 때만 저장. slot 키는 `valid_slot_keys`로 형식·날짜·시간대·단위 정렬을 검사하고 blocked 칸은 제거(모두 서버에서).
+- `create_event`: 어제 이전 날짜 거부(`past_date`), blocked 키도 `valid_slot_keys`로 검증.
+- 읽기 보안: 테이블에 select 정책이 없으므로 **이벤트 id를 모르면 어떤 데이터도 읽을 수 없다.** 실시간도 토픽 이름에 id가 들어가는 비공개 채널(`realtime.messages` RLS)이라 같은 보장을 유지한다.
 - Finalize 후 수정 불가 = events에 update/delete 경로를 만들지 않음.
 
 ## 6. 주요 데이터 흐름
@@ -92,7 +94,7 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 | 이벤트 생성 | form·edit 단계는 React 상태로만 유지 → Finalize 클릭 → `create_event` → share 단계에 `/e/{id}` 표시 |
 | 로그인 | SignInForm → `join_event` → `{participant_id, token}`을 localStorage(`wwm:{eventId}`)에 저장 → 재방문 시 자동 로그인 |
 | 응답 저장 | 칸 클릭 → 화면 즉시 반영 → 300ms 디바운스 → `save_availability` → `Saved` 표시. 실패 시 재시도 |
-| 실시간 | EventPage 진입 → availability 전체 로드 → `event_id` 필터로 변경 구독 → 응답 목록 갱신 → `countBySlot` / `bestSlot` 재계산 → 그리드·Best time 재렌더 |
+| 실시간 | EventPage 진입 → `list_availability` 전체 로드 → 비공개 채널 `event:<id>` broadcast 구독 → 응답 목록 갱신(재조회 중 도착한 변경은 재조회 결과 위에 재적용) → `countBySlot` / `bestSlot` 재계산 → 그리드·Best time 재렌더 |
 | 재연결 | 구독 끊김 → `Reconnecting…` → 재연결 시 전체 다시 로드 |
 
 ## 7. 테스트 전략
@@ -106,5 +108,6 @@ availability (                         -- 공개: 히트맵·실시간 구독 �
 | 2026-10-17 | `lib/session` 모듈 추가 (Spec 03). 로그인 유지 저장소 접근을 한곳에 모음 |
 | 2026-10-17 | Realtime 구독을 `lib/api.subscribeAvailability`로 감싸고 `hooks/useEventRealtime`은 이를 호출 (Spec 04). supabase 클라이언트 접근을 `lib/api`로 한정 |
 | 2026-10-17 | Vercel 프로덕션 배포 (https://whenwemeet-beta.vercel.app). Vite dev 서버 `host: true` |
+| 2026-10-17 | **보안 구조 변경 (코드 리뷰 F4 #1)**: 테이블 select 정책 제거, 읽기는 RPC `get_event`·`list_availability`, 실시간은 비공개 broadcast 채널. slot 키 서버 검증 추가. `supabase/migrations/002_security.sql` |
 - RPC: `supabase/migrations`의 SQL을 로컬/개발 프로젝트에 적용 후 수동 확인.
 - 화면: spec의 AC별 수동 확인 절차를 `tasks.md`에 기록 (데스크톱 + 375px 모바일, 브라우저 2개로 실시간 확인).

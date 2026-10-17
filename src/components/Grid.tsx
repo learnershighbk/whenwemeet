@@ -24,7 +24,10 @@ export type GridProps =
       /** Cell chosen by tap/focus — for the detail panel */
       activeCell?: SlotKey | null
       onCellHover?: (key: SlotKey | null, rect: DOMRect | null) => void
+      /** Pointer click/tap on a cell */
       onCellTap?: (key: SlotKey) => void
+      /** Keyboard focus on a cell (:focus-visible only) */
+      onCellFocus?: (key: SlotKey) => void
     })
 
 const HATCH = 'repeating-linear-gradient(135deg, transparent 0 4px, rgba(0,0,0,0.08) 4px 6px)'
@@ -144,7 +147,7 @@ export default function Grid(props: GridProps) {
                       aria-label={isBlocked ? `${label}, blocked` : `${label}, ${names.length} of ${props.total} available`}
                       onPointerEnter={(e) => !isBlocked && props.onCellHover?.(key, e.currentTarget.getBoundingClientRect())}
                       onClick={() => !isBlocked && props.onCellTap?.(key)}
-                      onFocus={() => !isBlocked && props.onCellTap?.(key)}
+                      onFocus={(e) => !isBlocked && e.currentTarget.matches(':focus-visible') && props.onCellFocus?.(key)}
                       className={[
                         ...edges,
                         'relative focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ink',

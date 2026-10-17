@@ -95,8 +95,24 @@ export function adjustEndHour(start: number, end: number): number {
 
 // ─── Time zones ─────────────────────────────────────────
 
+/** Short list for browsers without Intl.supportedValuesOf (Safari < 15.4) */
+const FALLBACK_ZONES = [
+  'UTC', 'America/Los_Angeles', 'America/Denver', 'America/Chicago', 'America/New_York', 'America/Sao_Paulo',
+  'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Moscow', 'Africa/Cairo', 'Africa/Johannesburg',
+  'Asia/Dubai', 'Asia/Kolkata', 'Asia/Bangkok', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Tokyo', 'Asia/Seoul',
+  'Australia/Sydney', 'Pacific/Auckland',
+]
+
 export function listTimezones(): string[] {
-  const zones = Intl.supportedValuesOf('timeZone')
+  const supported = (Intl as { supportedValuesOf?: (k: string) => string[] }).supportedValuesOf
+  let zones: string[]
+  try {
+    zones = typeof supported === 'function' ? supported.call(Intl, 'timeZone') : [...FALLBACK_ZONES]
+  } catch {
+    zones = [...FALLBACK_ZONES]
+  }
+  const local = Intl.DateTimeFormat().resolvedOptions().timeZone
+  if (local && !zones.includes(local)) zones = [...zones, local]
   return zones.includes('UTC') ? zones : [...zones, 'UTC']
 }
 

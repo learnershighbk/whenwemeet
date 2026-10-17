@@ -101,7 +101,7 @@ bestSlot(rows, responses, blocked): { key, available: string[], unavailable: str
 - Group 영역 제목 옆에 `Responses ({total})`. 아래에 이름을 알파벳순으로 ` · `로 이어 표시. 본인은 **굵게**.
 
 ### R8. 실시간 (`hooks/useEventRealtime`)
-- 진입 시 `availability`를 `event_id`로 전체 조회 → 이후 Supabase Realtime(`postgres_changes`, `filter: event_id=eq.{id}`)으로 INSERT/UPDATE/DELETE 반영.
+- 진입 시 RPC `list_availability(event_id)`로 전체 조회 → 이후 비공개 Realtime 채널 `event:{id}`의 broadcast(INSERT/UPDATE/DELETE, DB 트리거가 발행)로 반영. *(2026-10-17 변경: 보안 리뷰로 `postgres_changes` → broadcast)*
 - 변경마다 `countBySlot`·`bestSlot` 재계산 → Group 그리드, 상세, Best time, `Responses (n)` 갱신. 목표 지연 2초 이내.
 - 채널 상태가 `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED`가 되면 상단에 `Reconnecting…` 띠 표시. 다시 `SUBSCRIBED`가 되면 전체를 다시 조회하고 띠 제거.
 - 로그인 여부와 무관하게 동작(로그인 전 Group 그리드·Best time 조회).

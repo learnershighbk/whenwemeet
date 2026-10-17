@@ -6,6 +6,7 @@ import {
   adjustEndHour,
   expandRange,
   groupTimezones,
+  listTimezones,
   hourLabel,
   monthWeeks,
   rangeClick,
@@ -119,5 +120,26 @@ describe('summarizeDates', () => {
     expect(summarizeDates(['2026-10-20', '2026-10-22', '2026-10-24'])).toBe('3 days')
     expect(summarizeDates(['2026-10-30', '2026-10-31', '2026-11-01'])).toBe('Oct 30 – Nov 1')
     expect(summarizeDates([])).toBe('')
+  })
+})
+
+describe('listTimezones', () => {
+  it('falls back to a short list when Intl.supportedValuesOf is missing', () => {
+    const original = (Intl as { supportedValuesOf?: unknown }).supportedValuesOf
+    // @ts-expect-error simulate an older browser
+    delete Intl.supportedValuesOf
+    try {
+      const zones = listTimezones()
+      expect(zones).toContain('UTC')
+      expect(zones).toContain(Intl.DateTimeFormat().resolvedOptions().timeZone)
+      expect(zones.length).toBeGreaterThan(10)
+    } finally {
+      ;(Intl as { supportedValuesOf?: unknown }).supportedValuesOf = original
+    }
+  })
+  it('includes UTC and the local zone when supported', () => {
+    const zones = listTimezones()
+    expect(zones).toContain('UTC')
+    expect(zones).toContain('Asia/Seoul')
   })
 })

@@ -237,3 +237,38 @@ Out of scope, noticed: the first attempt wrote nothing because a single large ba
 ## 2026-10-17 18:45:25
 
 F2~F4 작업 먼저 진행하라
+
+---
+
+## 2026-10-17 18:48:44
+
+<task-notification>
+<task-id>a67f2531a8e5154fa</task-id>
+<tool-use-id>toolu_01DnJ4tr1rUZstMMtYY4NbBj</tool-use-id>
+<output-file>C:\Users\KDIS\AppData\Local\Temp\claude\D-----03--AI-Projects-whenwemeet\04b42da4-6787-4b76-a7eb-edea6d87617e\tasks\a67f2531a8e5154fa.output</output-file>
+<status>completed</status>
+<summary>Agent "Review WhenWeMeet codebase" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Task: read-only review of src/, `001_init.sql`, vite/vercel config against PRD, architecture, Specs 01–04.
+
+1. `[S][sev: high] supabase/migrations/001_init.sql:50,53` — `using (true)` select policies on `events` and `availability` let the anon key list every event and every participant across all events — `supabase.from('events').select('*')` returns all ids+titles, so the "unguessable URL" protection (PRD §4, architecture §5) is void and every name/slot set is public — fix: move reads behind security-definer RPCs `get_event(id)` / `list_availability(event_id)` and drop the policies; since `postgres_changes` needs the select policy, switch realtime to a trigger using `realtime.broadcast_changes` on topic `event:&lt;id&gt;` (topic = secret). CONFIRMED.
+2. `[C][sev: med] src/pages/EventPage.tsx:79` — `selected` is seeded from `responses` whenever `status !== 'loading'`, including `'reconnecting'` set by a failed initial load — returning participant opens the page on a flaky network → seeded with `[]` → first click saves only the new slot and wipes their saved slots — fix: seed only when `status === 'live'` (or when own row is present). CONFIRMED.
+3. `[S][sev: med] supabase/migrations/001_init.sql:183-191` — `save_availability` only caps count (2976) and strips blocked keys; slot strings are not format- or membership-checked — client can store 2976 multi-KB arbitrary strings that are persisted and broadcast to every viewer (storage/bandwidth abuse; UI ignores unknown keys so no render impact) — fix: reject keys not matching `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$` or outside the event's dates/hours/slot alignment. CONFIRMED.
+4. `[C][sev: med] src/lib/dates.ts:99` — `Intl.supportedValuesOf` is called unguarded in `listTimezones()`, used by `defaultTimezone` in a `useState` initializer — Safari &lt; 15.4 / older Chromium throws → `/` renders a blank page — fix: `typeof Intl.supportedValuesOf === 'function' ? … : [browserTz, 'UTC', …short fallback]`. CONFIRMED.
+5. `[C][sev: low] src/pages/EventPage.tsx:280-293` — after `signOut()`→`save.reset()`, an in-flight save that then fails sets `'retrying'` and schedules `flush`, which bails on the null session but never resets state → after re-sign-in the My grid shows "Couldn't save. Retrying…" until the next edit — fix: capture `participantId` before the request and ignore the result (and reset state) if `sessionRef.current?.participantId` differs. CONFIRMED.
+6. `[C][sev: low] src/hooks/useEventRealtime.ts:20-29` — `reload()` replaces `responses` wholesale; a realtime UPDATE applied while the initial/SUBSCRIBED reload is in flight is overwritten by the older snapshot and only corrected on the next resubscribe — fix: sequence-stamp reloads and merge by `participantId` instead of replacing. PLAUSIBLE.
+7. `[P][sev: low] src/pages/EventPage.tsx:148` — two-column layout uses `lg:` (≥1024px) while Spec 04 §2 says desktop ≥768px; tablets 768–1023 get the stacked layout — fix: `md:grid-cols-2`. CONFIRMED.
+8. `[P][sev: low] src/components/Grid.tsx:147` — heatmap `onFocus` fires `onCellTap` on mouse click too, so on fine-pointer devices a click opens the detail panel in addition to the hover tooltip (Spec 04 R5 reserves the panel for touch/keyboard) — fix: only call `onCellTap` from `onFocus` when `e.target.matches(':focus-visible')`, keep `onClick` for coarse pointers. CONFIRMED.
+9. `[S][sev: low] supabase/migrations/001_init.sql (create_event)` — past dates and `start_hour/end_hour` relation to `blocked_slots` are validated client-side only; a crafted RPC call can create events with past dates or blocked keys outside the grid (harmless to the UI, which ignores them). CONFIRMED.
+
+Verified OK: `participants` has RLS with no policies (token/hash unreadable); `security definer` functions pin `search_path`; id loop is parameter-free (no injection); token only travels via RPC response → localStorage, never URLs; React escaping covers `title`/`name`; `bestSlot` tie-break is chronological per PRD; Calendar month wrap at year end, `adjustEndHour`, `summarizeDates` cross-month, `.env.example` tracked, Vercel static-first + SPA rewrite all fine.
+
+tests 27/27 pass · `tsc -b --noEmit` exit 0 · `npm run build` pass.</result>
+<usage><subagent_tokens>385413</subagent_tokens><tool_uses>5</tool_uses><duration_ms>161048</duration_ms></usage>
+</task-notification>
+
+---
+
+## 2026-10-17 18:53:58
+
+위 사항 모두 승인할께.B방식은 권장안에 따라 진행하라. 모바일에서도 문제 없이 작동하는 것으로 확인했어. 우선 현재 작업 마치고 커밋하라. 배포는 조금 있다가 할거야

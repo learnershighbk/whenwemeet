@@ -34,25 +34,33 @@ export async function createEvent(
   return data as string
 }
 
-/** Loads one event. Resolves to null when the id doesn't exist. Throws on network/server errors. */
+/** Loads one event via RPC get_event. Resolves to null when the id doesn't exist. Throws on network/server errors. */
 export async function getEvent(id: string): Promise<Event | null> {
-  const { data, error } = await supabase
-    .from('events')
-    .select('id, title, dates, start_hour, end_hour, timezone, slot_minutes, blocked_slots')
-    .eq('id', id)
-    .maybeSingle()
+  const { data, error } = await supabase.rpc('get_event', { p_id: id })
   if (error) throw error
-  if (!data) return null
+  const row = (Array.isArray(data) ? data[0] : data) as EventRow | undefined
+  if (!row) return null
   return {
-    id: data.id,
-    title: data.title,
-    dates: data.dates,
-    startHour: data.start_hour,
-    endHour: data.end_hour,
-    timezone: data.timezone,
-    slotMinutes: data.slot_minutes,
-    blockedSlots: data.blocked_slots ?? [],
+    id: row.id,
+    title: row.title,
+    dates: row.dates,
+    startHour: row.start_hour,
+    endHour: row.end_hour,
+    timezone: row.timezone,
+    slotMinutes: row.slot_minutes,
+    blockedSlots: row.blocked_slots ?? [],
   }
+}
+
+type EventRow = {
+  id: string
+  title: string
+  dates: DateKey[]
+  start_hour: number
+  end_hour: number
+  timezone: string
+  slot_minutes: SlotMinutes
+  blocked_slots: SlotKey[] | null
 }
 
 export type JoinErrorCode = 'wrong_password' | 'invalid_name' | 'event_full' | 'event_not_found' | 'unknown'
@@ -85,16 +93,8 @@ export async function joinEvent(
   }
   const row = Array.isArray(data) ? data[0] : data
   if (!row?.participant_id || !row?.token) throw new JoinError('unknown')
-
-  const { data: av } = await supabase
-    .from('availability')
-    .select('name')
-    .eq('participant_id', row.participant_id)
-    .maybeSingle()
-  return { participantId: row.participant_id, token: row.token, name: av?.name ?? name }
+  return { participantId: row.participant_id, token: row.token, name: row.display_name ?? name }
 }
-
-// ─── Availability (specs/04-availability R3, R8) ─────────
 
 export type SaveErrorCode = 'not_allowed' | 'unknown'
 
@@ -114,12 +114,9 @@ const toResponse = (row: AvailabilityRow): Response => ({
 
 /** Every response for the event — one row per participant, including those with no slots yet. */
 export async function listAvailability(eventId: string): Promise<Response[]> {
-  const { data, error } = await supabase
-    .from('availability')
-    .select('participant_id, name, slots')
-    .eq('event_id', eventId)
+  const { data, error } = await supabase.rpc('list_availability', { p_event_id: eventId })
   if (error) throw error
-  return (data as AvailabilityRow[]).map(toResponse)
+  return ((data ?? []) as AvailabilityRow[]).map(toResponse)
 }
 
 /** Saves the participant's slots via RPC save_availability. Throws SaveError('not_allowed') on a bad token. */
@@ -138,8 +135,15 @@ export type AvailabilityChange =
 
 export type ChannelStatus = 'SUBSCRIBED' | 'CHANNEL_ERROR' | 'TIMED_OUT' | 'CLOSED'
 
+type BroadcastPayload = {
+  operation: 'INSERT' | 'UPDATE' | 'DELETE'
+  record: AvailabilityRow | null
+  old_record: AvailabilityRow | null
+}
+
 /**
- * Realtime changes to the event's availability rows. Returns an unsubscribe function.
+ * Realtime changes to the event's availability rows, over the private broadcast topic `event:<id>`
+ * (fed by the availability_broadcast trigger in 002_security.sql). Returns an unsubscribe function.
  * supabase-js reconnects on its own; onStatus reports each transition so the caller can reload on SUBSCRIBED.
  */
 export function subscribeAvailability(
@@ -148,20 +152,15 @@ export function subscribeAvailability(
   onStatus: (status: ChannelStatus) => void,
 ): () => void {
   const channel = supabase
-    .channel(`event:${eventId}`)
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'availability', filter: `event_id=eq.${eventId}` },
-      (payload) => {
-        if (payload.eventType === 'DELETE') {
-          // `old` carries only the primary key unless REPLICA IDENTITY FULL is set
-          const id = (payload.old as Partial<AvailabilityRow>).participant_id
-          if (id) onChange({ type: 'delete', participantId: id })
-          return
-        }
-        onChange({ type: 'upsert', response: toResponse(payload.new as AvailabilityRow) })
-      },
-    )
+    .channel(`event:${eventId}`, { config: { private: true } })
+    .on('broadcast', { event: '*' }, ({ payload }) => {
+      const p = payload as BroadcastPayload
+      if (p.operation === 'DELETE') {
+        if (p.old_record?.participant_id) onChange({ type: 'delete', participantId: p.old_record.participant_id })
+        return
+      }
+      if (p.record) onChange({ type: 'upsert', response: toResponse(p.record) })
+    })
     .subscribe((status) => onStatus(status as ChannelStatus))
   return () => {
     supabase.removeChannel(channel)
