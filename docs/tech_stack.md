@@ -1,4 +1,4 @@
-# Tech Stack — WhenWeMeet (Draft)
+# Tech Stack — WhenWeMeet
 
 > 원칙: 현재 기능(prd.md)을 만족하는 **가장 단순한** 구성. 직접 운영하는 백엔드 서버 없음.
 
@@ -10,8 +10,8 @@
 | 비밀번호 확인 | Supabase Postgres 함수(RPC) + `pgcrypto` | 해시 비교를 DB 안에서 처리, 해시가 클라이언트에 노출되지 않음 |
 | 날짜/타임존 | `date-fns`, `Intl` API | 타임존 변환이 없어 날짜 계산만 필요. 타임존 목록·GMT 오프셋은 `Intl`로 얻음 |
 | 라우팅 | `react-router` | `/`, `/e/:id` 두 경로만 필요 |
-| 배포 | Vercel (정적 SPA) | Git 연결만으로 배포 |
-| 테스트 | Vitest | Vite와 설정 공유, `lib/slots` 단위 테스트 |
+| 배포 | Vercel (정적 SPA) | https://whenwemeet-beta.vercel.app · 환경 변수 `VITE_SUPABASE_*` 2개 |
+| 테스트 | Vitest | Vite와 설정 공유, `lib/dates`·`lib/slots` 단위 테스트 |
 
 설치 버전 (2026-10-17): React 19, Vite 8, TypeScript 7, Tailwind 4, Vitest 5, react-router 7, supabase-js 2, date-fns 4.
 

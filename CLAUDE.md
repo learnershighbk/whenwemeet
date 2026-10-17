@@ -35,6 +35,7 @@
 | `npm run dev` | 개발 서버 |
 | `npm run build` | 타입 검사 + 빌드 |
 | `npm test` | Vitest 실행 |
+| `vercel --prod` | 프로덕션 배포 (https://whenwemeet-beta.vercel.app). GitHub push 자동 배포는 미연결 |
 
 - 환경 변수: `.env.example`을 `.env`로 복사 후 Supabase URL/anon key 입력
 - DB: `supabase/migrations/*.sql`을 Supabase SQL Editor에서 순서대로 실행

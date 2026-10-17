@@ -225,3 +225,15 @@ Out of scope, noticed: the first attempt wrote nothing because a single large ba
 ## 2026-10-17 18:37:40
 
 다 점검했어. 커밋하고 다음단계 진행항라
+
+---
+
+## 2026-10-17 18:40:32
+
+! vercel login
+
+---
+
+## 2026-10-17 18:45:25
+
+F2~F4 작업 먼저 진행하라
